@@ -81,10 +81,13 @@ public class TradeHandler {
             }
         }
 
-        if (quantity < 1.5) {
+        if (quantity <= 1.99) {
             quantity = Math.round(quantity * 100.0) / 100.0;
         } else {
             quantity = Double.valueOf(Math.round(quantity));
+            if (quantity > 2.0) {
+                quantity = quantity - 1;
+            }
         }
 
         Date date = new Date();
