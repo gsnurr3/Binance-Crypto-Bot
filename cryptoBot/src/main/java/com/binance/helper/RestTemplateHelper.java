@@ -1,5 +1,6 @@
 package com.binance.helper;
 
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class RestTemplateHelper {
 
-    public ResponseEntity<String> getResponseEntityString(String url) {
+    public ResponseEntity<String> getResponseEntityString(String url) throws SocketTimeoutException {
 
         URI uri = null;
 
@@ -36,7 +37,8 @@ public class RestTemplateHelper {
         return restTemplate.getForEntity(uri, String.class);
     }
 
-    public ResponseEntity<String> getResponseEntitySHA256String(String url, String apiKey) {
+    public ResponseEntity<String> getResponseEntitySHA256String(String url, String apiKey)
+            throws SocketTimeoutException {
 
         URI uri = null;
 
@@ -60,7 +62,8 @@ public class RestTemplateHelper {
         });
     }
 
-    public ResponseEntity<String> postResponseEntitySHA256String(String url, String apiKey) {
+    public ResponseEntity<String> postResponseEntitySHA256String(String url, String apiKey)
+            throws SocketTimeoutException {
 
         URI uri = null;
 

@@ -1,5 +1,6 @@
 package com.binance.dto;
 
+import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -53,7 +54,7 @@ public class KlinesDTO {
             try {
                 responseEntity = restTemplateHelper
                         .getResponseEntityString(klinesAPI.getKLINES_ENDPOINT() + queryString);
-            } catch (ResourceAccessException e) {
+            } catch (ResourceAccessException | SocketTimeoutException e) {
                 try {
                     Thread.sleep(30000);
                 } catch (InterruptedException e1) {

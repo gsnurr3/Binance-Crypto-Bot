@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import com.binance.cron.CandleStick_24HCron;
 import com.binance.handler.EmailHandler;
+import com.binance.handler.RestartHandler;
 import com.binance.handler.StrategyHandler;
 import com.binance.handler.TradeHandler;
 import com.binance.model.Coin;
@@ -53,7 +53,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     private EmailHandler emailHandler;
 
     @Autowired
-    private CandleStick_24HCron candleStick_24HCron;
+    private RestartHandler restartHandler;
 
     @Value("${trade.maxLossAllowed}")
     private Double maxLossAllowed;
@@ -159,11 +159,12 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     // minute - the 0th second).
     // Default 20 0 0 * * *
     @Scheduled(cron = "20 0 0 * * *", zone = "UTC")
-    private void getNewCandleStick_24H() {
+    private void restartApplication() {
 
         if (!isTrading) {
-            LOGGER.info("Running cron job to update candles to include candle stick for new day...");
-            coins = candleStick_24HCron.updateCandleSticks_24H(coins);
+            LOGGER.info("Performing daily restart...");
+            emailHandler.sendEmail("Daily Restart", "Application is currently not trading. Performing daily restart.");
+            restartHandler.restartApp();
         }
     }
 }

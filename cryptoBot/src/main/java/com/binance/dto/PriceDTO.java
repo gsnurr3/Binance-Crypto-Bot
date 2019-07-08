@@ -1,6 +1,7 @@
 package com.binance.dto;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 import com.binance.api.PriceAPI;
@@ -44,7 +45,7 @@ public class PriceDTO {
 
         try {
             responseEntity = restTemplateHelper.getResponseEntityString(priceApi.getPRICE_ENDPOINT());
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | SocketTimeoutException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());
@@ -85,7 +86,7 @@ public class PriceDTO {
 
         try {
             responseEntity = restTemplateHelper.getResponseEntityString(priceApi.getPRICE_ENDPOINT() + queryString);
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | SocketTimeoutException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());
@@ -124,7 +125,7 @@ public class PriceDTO {
 
         try {
             responseEntity = restTemplateHelper.getResponseEntityString(priceApi.getPRICE_ENDPOINT() + queryString);
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | SocketTimeoutException e) {
             LOGGER.error(e.getMessage(), e);
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());

@@ -1,6 +1,7 @@
 package com.binance.dto;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import com.binance.api.AccountAPI;
 import com.binance.handler.EmailHandler;
@@ -49,9 +50,9 @@ public class AccountDTO {
         try {
             responseEntity = restTemplateHelper.getResponseEntitySHA256String(
                     accountAPI.getACCOUNT_ENDPOINT() + queryString, accountAPI.getApiKey());
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | SocketTimeoutException e) {
             LOGGER.error(e.toString());
-
+            
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());
         }

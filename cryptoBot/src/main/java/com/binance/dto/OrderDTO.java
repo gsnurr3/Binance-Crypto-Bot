@@ -1,6 +1,7 @@
 package com.binance.dto;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 
 import com.binance.api.OrderAPI;
 import com.binance.handler.EmailHandler;
@@ -72,8 +73,9 @@ public class OrderDTO {
         try {
             responseEntity = restTemplateHelper
                     .postResponseEntitySHA256String(orderAPI.getORDER_ENDPOINT() + queryString, orderAPI.getApiKey());
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | SocketTimeoutException e) {
             LOGGER.error(e.getMessage(), e);
+            emailhandler.sendEmail("Error", e.toString());
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());
         }
@@ -87,6 +89,7 @@ public class OrderDTO {
             LOGGER.info(order.toString());
         } catch (IOException | NullPointerException e) {
             LOGGER.error(e.getMessage(), e);
+            emailhandler.sendEmail("Error", e.toString());
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());
         }
@@ -115,8 +118,9 @@ public class OrderDTO {
         try {
             responseEntity = restTemplateHelper
                     .postResponseEntitySHA256String(orderAPI.getORDER_ENDPOINT() + queryString, orderAPI.getApiKey());
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | SocketTimeoutException e) {
             LOGGER.error(e.getMessage(), e);
+            emailhandler.sendEmail("Error", e.toString());
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());
         }
@@ -130,6 +134,7 @@ public class OrderDTO {
             LOGGER.info(order.toString());
         } catch (IOException | NullPointerException e) {
             LOGGER.error(e.getMessage(), e);
+            emailhandler.sendEmail("Error", e.toString());
         } catch (Exception e) {
             emailhandler.sendEmail("Error", e.toString());
         }

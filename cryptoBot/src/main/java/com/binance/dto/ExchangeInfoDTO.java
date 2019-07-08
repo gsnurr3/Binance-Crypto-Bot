@@ -1,6 +1,7 @@
 package com.binance.dto;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.List;
 
 import com.binance.api.ExchangeInfoAPI;
@@ -43,7 +44,7 @@ public class ExchangeInfoDTO {
 
         try {
             responseEntity = restTemplateHelper.getResponseEntityString(exchangeInfoAPI.getEXCHANGE_INFO_ENDPOINT());
-        } catch (ResourceAccessException e) {
+        } catch (ResourceAccessException | SocketTimeoutException e) {
             try {
                 Thread.sleep(30000);
             } catch (InterruptedException e1) {

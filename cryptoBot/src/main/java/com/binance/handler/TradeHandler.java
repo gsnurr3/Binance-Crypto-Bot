@@ -81,7 +81,7 @@ public class TradeHandler {
             }
         }
 
-        quantity = Double.valueOf(Math.round(quantity));
+        quantity = Math.round(quantity * 100.0) / 100.0;
 
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
