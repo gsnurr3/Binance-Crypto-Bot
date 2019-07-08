@@ -75,11 +75,20 @@ public class TradeHandler {
         account = new Account();
         account = accountService.getAccountInfo();
 
+        Double btcQuantity = 0.0;
+        Double bnbQuantity = 0.0;
+
         for (Balance balance : account.getBalances()) {
             if (balance.getAsset().equals("BTC")) {
-                quantity = (balance.getFree() / winningCoin.getCurrentPrice()) * .95;
+                btcQuantity = balance.getFree();
+            }
+            if (balance.getAsset().equals("BNB")) {
+                bnbQuantity = balance.getFree();
             }
         }
+
+        quantity = btcQuantity - bnbQuantity;
+        quantity = (quantity / winningCoin.getCurrentPrice()) * .95;
 
         if (quantity <= 1.99) {
             quantity = Math.round(quantity * 100.0) / 100.0;
