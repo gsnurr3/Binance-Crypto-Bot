@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.TimeZone;
 
 import com.binance.handler.EmailHandler;
-import com.binance.handler.RestartHandler;
 import com.binance.handler.StrategyHandler;
 import com.binance.handler.TradeHandler;
 import com.binance.model.Coin;
@@ -52,9 +51,6 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     @Autowired
     private EmailHandler emailHandler;
 
-    @Autowired
-    private RestartHandler restartHandler;
-
     @Value("${trade.maxLossAllowed}")
     private Double maxLossAllowed;
 
@@ -66,14 +62,12 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
-        int count = 0;
-
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
         dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         LOGGER.info("UTC Time is: " + dateFormat.format(date));
-        LOGGER.info("Crypto Binance Bot starting...");
+        LOGGER.info("Binance Crypto Bot starting...");
 
         do {
             if (!isInitialized) {
@@ -84,18 +78,6 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
 
                 LOGGER.info("Will update coin(s) every 5 seconds...");
             } else {
-
-                count++;
-                if (count >= 720) {
-                    count = 0;
-
-                    date = new Date();
-                    dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-                    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                    LOGGER.info("UTC Time is: " + dateFormat.format(date));
-                    LOGGER.info("Crypto bot still running without error...");
-                }
 
                 coins = priceService.getAllPrices(coins);
                 coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks_24H(coins);
@@ -127,21 +109,18 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                     LOGGER.info("TOTAL PROFIT: " + totalProfit + "%");
                     LOGGER.info("*****************************************************");
 
-                    emailHandler.sendEmail("Sold Coin",
+                    emailHandler.sendEmail("Sold Coin: " + winningCoin.getSymbol(),
                             "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
+
+                    for (Coin coin : coins) {
+                        coin.getHighPriceInactivityWatch().reset();
+                        coin.getHighPriceInactivityWatch().start();
+                        coin.getHighPriceRecords().clear();
+                    }
 
                     coins = klinesService.getAllCandleSticks_24H(coins);
 
                     isTrading = false;
-                } else {
-                    if (totalProfit != 0.0) {
-                        // dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-                        // LOGGER.info("UTC Time is: " + dateFormat.format(date));
-                        // LOGGER.info("*****************************************************");
-                        // LOGGER.info("TOTAL PROFIT: " + totalProfit + "%");
-                        // LOGGER.info("*****************************************************");
-                    }
                 }
             }
             try {
@@ -159,12 +138,13 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     // minute - the 0th second).
     // Default 20 0 0 * * *
     @Scheduled(cron = "20 0 0 * * *", zone = "UTC")
-    private void restartApplication() {
+    private void updateCandleSticksForNewDay() {
 
         if (!isTrading) {
-            LOGGER.info("Performing daily restart...");
-            emailHandler.sendEmail("Daily Restart", "Application is currently not trading. Performing daily restart.");
-            restartHandler.restartApp();
+            LOGGER.info("Getting candle sticks for new day...");
+            emailHandler.sendEmail("Daily Candle Stick Update",
+                    "Binance Crypto Bot is currently not trading. Updating candle sticks for new day.");
+            coins = klinesService.getAllCandleSticks_24H(coins);
         }
     }
 }

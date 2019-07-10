@@ -49,7 +49,7 @@ public class ExchangeInfoDTO {
                 Thread.sleep(30000);
             } catch (InterruptedException e1) {
                 LOGGER.error(e.getMessage(), e);
-            } 
+            }
             getExchangeInfo(coins);
         }
 
@@ -74,6 +74,7 @@ public class ExchangeInfoDTO {
                     Coin coin = new Coin();
                     coin.setSymbol(symbol.getSymbol());
                     coin.setStatus(symbol.getStatus());
+                    coin.startHighPriceInactivityWatch();
 
                     coins.add(coin);
 

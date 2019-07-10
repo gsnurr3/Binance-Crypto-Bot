@@ -22,7 +22,7 @@ public class CandleStick_24H {
     private Double ignore;
     private Double endOfDayGain = 0.0;
     private Double endOfDayLoss = 0.0;
-
+    
     public Long getOpenTime() {
         return openTime;
     }

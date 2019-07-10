@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.google.common.base.Stopwatch;
 
 /**
  * CoinModel
@@ -12,12 +13,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Coin {
 
     private String symbol;
-
     private String status;
 
     private List<Double> prices = new ArrayList<>();
-
     private List<CandleStick_24H> candleSticks_24H = new ArrayList<>();
+    private List<HighPriceRecord> highPriceRecords = new ArrayList<>();
+
+    private Stopwatch highPriceInactivityWatch = Stopwatch.createUnstarted();
 
     public Coin() {
 
@@ -58,7 +60,7 @@ public class Coin {
                     this.prices.remove(0);
                 }
                 this.prices.add(price);
-            }  
+            }
         } else {
             this.prices.add(price);
         }
@@ -72,8 +74,38 @@ public class Coin {
         this.candleSticks_24H.add(candleStick_24H);
     }
 
+    public void setHighPriceRecords(List<HighPriceRecord> highPriceRecords) {
+        this.highPriceRecords = highPriceRecords;
+    }
+
+    public List<HighPriceRecord> getHighPriceRecords() {
+        return highPriceRecords;
+    }
+
+    public void addHighPriceRecord(HighPriceRecord highPriceRecord) {
+        this.highPriceRecords.add(highPriceRecord);
+    }
+
+    public void setHighPriceInactivityWatch(Stopwatch highPriceInactivityWatch) {
+        this.highPriceInactivityWatch = highPriceInactivityWatch;
+    }
+
+    public Stopwatch getHighPriceInactivityWatch() {
+        return highPriceInactivityWatch;
+    }
+
+    public void startHighPriceInactivityWatch() {
+        this.highPriceInactivityWatch.start();
+    }
+
+    public void stopHighPriceInactivityWatch() {
+        this.highPriceInactivityWatch.stop();
+    }
+
     @Override
     public String toString() {
-        return "Coin [candleSticks_24H=" + candleSticks_24H + ", prices=" + prices + ", symbol=" + symbol + "]";
+        return "Coin [candleSticks_24H=" + candleSticks_24H + ", highPriceInactivityWatch=" + highPriceInactivityWatch
+                + ", highPriceRecords=" + highPriceRecords + ", prices=" + prices + ", status=" + status + ", symbol="
+                + symbol + "]";
     }
 }

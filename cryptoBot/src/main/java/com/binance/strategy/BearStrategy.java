@@ -10,19 +10,20 @@ import com.binance.model.PotentialWinningCoin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * BottomOutStrategy
+ * BearStrategy
  */
 @Component
-public class BottomOutStrategy {
+public class BearStrategy {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BottomOutStrategy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BearStrategy.class);
 
     private List<Double> endOfDayDifferences = new ArrayList<>();
 
-    @Value("${bottom.out.strategy.lowestEndOfDayLossAccuracy}")
+    @Value("${bear.strategy.lowestEndOfDayLossAccuracy}")
     private Double lowestEndOfDayLossAccuracy;
 
     // Condition 2
@@ -135,12 +136,9 @@ public class BottomOutStrategy {
 
                     recordEndOfDayDifferences(todaysLoss, lowestEndOfDayLoss);
 
-                    LOGGER.info("Will buy coin if todays loss is lower than lowest end of day loss found...");
-                    LOGGER.info("Todays loss: " + todaysLoss + ", Lowest end of day loss: " + lowestEndOfDayLoss);
-
                     lowestEndOfDayLoss = lowestEndOfDayLoss * lowestEndOfDayLossAccuracy;
 
-                    LOGGER.info("Adjusted end of day loss: " + lowestEndOfDayLoss);
+                    LOGGER.info("Todays loss: " + todaysLoss + ", Lowest end of day loss: " + lowestEndOfDayLoss);
 
                     if (todaysLoss > lowestEndOfDayLoss) {
 
@@ -183,5 +181,11 @@ public class BottomOutStrategy {
         }
 
         LOGGER.info(data.toString());
+    }
+
+    @Scheduled(cron = "25 0 0 * * *", zone = "UTC")
+    private void resetBearData() {
+
+        endOfDayDifferences.clear();
     }
 }

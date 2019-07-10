@@ -41,6 +41,9 @@ public class TradeHandler {
     @Value("${trade.marginFromCurrentAndHighestPrice}")
     private Double marginFromCurrentAndHighestPrice;
 
+    @Value("${trade.test.mode}")
+    private Boolean testMode;
+
     private Account account;
 
     private Order order;
@@ -72,21 +75,23 @@ public class TradeHandler {
 
         holdCoinCount = 0;
 
-        account = new Account();
-        account = accountService.getAccountInfo();
+        if (!testMode) {
+            account = new Account();
+            account = accountService.getAccountInfo();
 
-        for (Balance balance : account.getBalances()) {
-            if (balance.getAsset().equals("BTC")) {
-                quantity = (balance.getFree() / winningCoin.getCurrentPrice()) * .90;
+            for (Balance balance : account.getBalances()) {
+                if (balance.getAsset().equals("BTC")) {
+                    quantity = (balance.getFree() / winningCoin.getCurrentPrice()) * .90;
+                }
             }
-        }
 
-        if (quantity <= 1.99) {
-            quantity = Math.round(quantity * 100.0) / 100.0;
-        } else {
-            quantity = Double.valueOf(Math.round(quantity));
-            if (quantity > 2.0) {
-                quantity = quantity - 1;
+            if (quantity <= 1.99) {
+                quantity = Math.round(quantity * 100.0) / 100.0;
+            } else {
+                quantity = Double.valueOf(Math.round(quantity));
+                if (quantity > 2.0) {
+                    quantity = quantity - 1;
+                }
             }
         }
 
@@ -98,20 +103,25 @@ public class TradeHandler {
         LOGGER.info("******************** BUYING COIN ********************");
         LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
 
-        order = new Order();
-        order = orderService.postBuyOrder(winningCoin, quantity);
+        if (!testMode) {
+            order = new Order();
+            order = orderService.postBuyOrder(winningCoin, quantity);
 
-        int count = 0;
-        Double avgPrice = 0.0;
+            int count = 0;
+            Double avgPrice = 0.0;
 
-        for (Fill fill : order.getFills()) {
-            avgPrice = avgPrice + fill.getPrice();
-            count++;
+            for (Fill fill : order.getFills()) {
+                avgPrice = avgPrice + fill.getPrice();
+                count++;
+            }
+
+            avgPrice = avgPrice / count;
+
+            winningCoin.setBuyPrice(avgPrice);
+        } else {
+            winningCoin.setBuyPrice(winningCoin.getCurrentPrice());
         }
 
-        avgPrice = avgPrice / count;
-
-        winningCoin.setBuyPrice(avgPrice);
         winningCoin.setProfitSinceBuyPrice();
         winningCoin.setBought(true);
     }
@@ -144,20 +154,25 @@ public class TradeHandler {
         LOGGER.info("******************* SELLING COIN ********************");
         LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
 
-        order = new Order();
-        order = orderService.postSellOrder(winningCoin, quantity);
+        if (!testMode) {
+            order = new Order();
+            order = orderService.postSellOrder(winningCoin, quantity);
 
-        int count = 0;
-        Double avgPrice = 0.0;
+            int count = 0;
+            Double avgPrice = 0.0;
 
-        for (Fill fill : order.getFills()) {
-            avgPrice = avgPrice + fill.getPrice();
-            count++;
+            for (Fill fill : order.getFills()) {
+                avgPrice = avgPrice + fill.getPrice();
+                count++;
+            }
+
+            avgPrice = avgPrice / count;
+
+            winningCoin.setSellPrice(avgPrice);
+        } else {
+            winningCoin.setSellPrice(winningCoin.getCurrentPrice());
         }
 
-        avgPrice = avgPrice / count;
-
-        winningCoin.setSellPrice(avgPrice);
         winningCoin.setProfit();
         winningCoin.setSold(true);
     }
