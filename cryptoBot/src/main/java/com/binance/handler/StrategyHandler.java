@@ -2,10 +2,8 @@ package com.binance.handler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.binance.model.Coin;
-import com.binance.model.HighPriceRecord;
 import com.binance.model.PotentialWinningCoin;
 import com.binance.strategy.BearStrategy;
 import com.binance.strategy.BullStrategy;
@@ -53,36 +51,40 @@ public class StrategyHandler {
                 LOGGER.info("Updating highest price to " + coin.getPrices().get(coin.getPrices().size() - 1) + " for "
                         + coin.getSymbol());
 
-                if (coin.getHighPriceInactivityWatch().isRunning()) {
-                    coin.stopHighPriceInactivityWatch();
+                // if (coin.getHighPriceInactivityWatch().isRunning()) {
+                // coin.stopHighPriceInactivityWatch();
 
-                    LOGGER.info("Stopping stopwatch at (seconds): "
-                            + coin.getHighPriceInactivityWatch().elapsed(TimeUnit.SECONDS));
-                }
+                // LOGGER.info("Stopping stopwatch at (seconds): "
+                // + coin.getHighPriceInactivityWatch().elapsed(TimeUnit.SECONDS));
+                // }
 
-                if (coin.getHighPriceInactivityWatch().elapsed(TimeUnit.SECONDS) >= highPriceInactivityWatchLimit) {
+                // if (coin.getHighPriceInactivityWatch().elapsed(TimeUnit.SECONDS) >=
+                // highPriceInactivityWatchLimit) {
 
-                    LOGGER.info("Condition 1 passed. Adding coin to potential winning coins for further evaluation...");
+                // LOGGER.info("Condition 1 passed. Adding coin to potential winning coins for
+                // further evaluation...");
 
-                    coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
+                // coin.addHighPriceRecord(new
+                // HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
 
-                    PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
-                            coin.getStatus(), coin.getPrices(), coin.getCandleSticks_24H());
-                    potentialWinningCoin.setIsHighestPrice(true);
-                    potentialWinningCoin.setHighPriceRecords(coin.getHighPriceRecords());
-                    potentialWinningCoin.setHighPriceInactivityWatch(coin.getHighPriceInactivityWatch());
+                // PotentialWinningCoin potentialWinningCoin = new
+                // PotentialWinningCoin(coin.getSymbol(),
+                // coin.getStatus(), coin.getPrices(), coin.getCandleSticks_24H());
+                // potentialWinningCoin.setIsHighestPrice(true);
+                // potentialWinningCoin.setHighPriceRecords(coin.getHighPriceRecords());
+                // potentialWinningCoin.setHighPriceInactivityWatch(coin.getHighPriceInactivityWatch());
 
-                    potentialWinningCoins.add(potentialWinningCoin);
-                } else {
-                    coin.getHighPriceInactivityWatch().reset();
-                    coin.getHighPriceInactivityWatch().start();
-                }
+                // potentialWinningCoins.add(potentialWinningCoin);
+                // } else {
+                // coin.getHighPriceInactivityWatch().reset();
+                // coin.getHighPriceInactivityWatch().start();
+                // }
 
-                if (coin.getHighPriceRecords().size() == highPriceRecordLimit) {
-                    coin.getHighPriceInactivityWatch().reset();
-                    coin.getHighPriceInactivityWatch().start();
-                    coin.getHighPriceRecords().clear();
-                }
+                // if (coin.getHighPriceRecords().size() == highPriceRecordLimit) {
+                // coin.getHighPriceInactivityWatch().reset();
+                // coin.getHighPriceInactivityWatch().start();
+                // coin.getHighPriceRecords().clear();
+                // }
             }
 
             if (coin.getPrices().get(coin.getPrices().size() - 1) < coin.getCandleSticks_24H()

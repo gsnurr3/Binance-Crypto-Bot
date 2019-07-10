@@ -52,7 +52,31 @@ public class TradeHandler {
 
     private int holdCoinCount;
 
+    private Double diminishingMargin;
+
     public WinningCoin tradeCoin(WinningCoin winningCoin) {
+
+        if (winningCoin.getProfitSinceBuyPrice() >= 1.75 && diminishingMargin < 0.25) {
+            diminishingMargin = 0.25;
+        }
+        if (winningCoin.getProfitSinceBuyPrice() >= 2.0 && diminishingMargin < 0.50) {
+            diminishingMargin = 0.50;
+        }
+        if (winningCoin.getProfitSinceBuyPrice() >= 2.25 && diminishingMargin < 0.75) {
+            diminishingMargin = 0.75;
+        }
+        if (winningCoin.getProfitSinceBuyPrice() >= 2.5 && diminishingMargin < 1.00) {
+            diminishingMargin = 1.00;
+        }
+        if (winningCoin.getProfitSinceBuyPrice() >= 3.0 && diminishingMargin < 1.25) {
+            diminishingMargin = 1.25;
+        }
+        if (winningCoin.getProfitSinceBuyPrice() >= 4.0 && diminishingMargin < 1.50) {
+            diminishingMargin = 1.50;
+        }
+        if (winningCoin.getProfitSinceBuyPrice() >= 6.0) {
+            diminishingMargin = 0.0;
+        }
 
         if (!winningCoin.isBought()) {
             buyCoin(winningCoin);
@@ -61,8 +85,8 @@ public class TradeHandler {
             holdCoin(winningCoin);
         } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() >= profitBeforeSelling
                 || winningCoin.getProfitSinceBuyPrice() <= lossBeforeSelling) {
-            if (winningCoin.getProfitSinceBuyPrice() >= lossBeforeSelling
-                    && winningCoin.getMarginFromCurrentAndHighestPrice() >= marginFromCurrentAndHighestPrice) {
+            if (winningCoin.getProfitSinceBuyPrice() >= lossBeforeSelling && winningCoin
+                    .getMarginFromCurrentAndHighestPrice() >= (marginFromCurrentAndHighestPrice + diminishingMargin)) {
                 holdCoin(winningCoin);
             } else {
                 sellCoin(winningCoin);
@@ -73,6 +97,7 @@ public class TradeHandler {
 
     public void buyCoin(WinningCoin winningCoin) {
 
+        diminishingMargin = 0.0;
         holdCoinCount = 0;
 
         if (!testMode) {
