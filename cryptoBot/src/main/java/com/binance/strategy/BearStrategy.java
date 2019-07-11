@@ -134,9 +134,9 @@ public class BearStrategy {
                     Double todaysLoss = ((candleStick_24H.getLowPrice() - candleStick_24H.getOpenPrice())
                             / candleStick_24H.getOpenPrice()) * 100;
 
-                    recordEndOfDayDifferences(todaysLoss, lowestEndOfDayLoss);
-
                     lowestEndOfDayLoss = lowestEndOfDayLoss * lowestEndOfDayLossAccuracy;
+
+                    recordEndOfDayDifferences(todaysLoss, lowestEndOfDayLoss);
 
                     LOGGER.info("Todays loss: " + todaysLoss + ", Lowest end of day loss: " + lowestEndOfDayLoss);
 
