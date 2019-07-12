@@ -162,7 +162,7 @@ public class TradeHandler {
         holdCoinCount++;
         winningCoin.setProfitSinceBuyPrice();
 
-        if (holdCoinCount >= 720) {
+        if (holdCoinCount >= 360) {
             holdCoinCount = 0;
 
             Date date = new Date();

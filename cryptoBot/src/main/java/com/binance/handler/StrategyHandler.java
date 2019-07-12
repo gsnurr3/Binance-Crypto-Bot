@@ -50,29 +50,34 @@ public class StrategyHandler {
 
         for (Coin coin : coins) {
 
-            long totalTimeInSeconds = 0;
-            if (coin.getHighPriceRecords().size() >= 1) {
-
-                totalTimeInSeconds = coin.getHighPriceRecords().get(0).getStopwatch().elapsed(TimeUnit.SECONDS);
-
-                if (totalTimeInSeconds > highPriceRecordTimeLimit) {
-                    LOGGER.info("Total time (" + totalTimeInSeconds
-                            + ") for records exceeded high price record time limit (" + highPriceRecordTimeLimit
-                            + "). Restarting stopwatch and clearing high price records for: " + coin.getSymbol());
-                    coin.getHighPriceInactivityWatch().reset();
-                    coin.getHighPriceInactivityWatch().start();
-                    coin.getHighPriceRecords().clear();
-                }
-            }
-
             if (coin.getPrices().get(coin.getPrices().size() - 1) > coin.getCandleSticks_24H()
                     .get(coin.getCandleSticks_24H().size() - 1).getHighPrice()) {
+
                 coin.getCandleSticks_24H().get(coin.getCandleSticks_24H().size() - 1)
                         .setHighPrice(coin.getPrices().get(coin.getPrices().size() - 1));
 
                 LOGGER.info("Updating highest price to " + coin.getPrices().get(coin.getPrices().size() - 1) + " for "
                         + coin.getSymbol());
 
+                // Check if coin has surpassed highPriceRecordTimeLimit
+                // TO DO: Needs moved to bull strategy
+                long totalTimeInSeconds = 0;
+                if (coin.getHighPriceRecords().size() >= 1) {
+
+                    totalTimeInSeconds = coin.getHighPriceRecords().get(0).getStopwatch().elapsed(TimeUnit.SECONDS);
+
+                    if (totalTimeInSeconds > highPriceRecordTimeLimit) {
+                        LOGGER.info("Total time (" + totalTimeInSeconds
+                                + ") for records exceeded high price record time limit (" + highPriceRecordTimeLimit
+                                + "). Restarting stopwatch and clearing high price records for: " + coin.getSymbol());
+                        coin.getHighPriceInactivityWatch().reset();
+                        coin.getHighPriceInactivityWatch().start();
+                        coin.getHighPriceRecords().clear();
+                    }
+                }
+
+                // Stop watch once first recent new high price is found
+                // TO DO: Needs moved to bull strategy
                 if (coin.getHighPriceInactivityWatch().isRunning()) {
                     coin.stopHighPriceInactivityWatch();
 
@@ -111,6 +116,7 @@ public class StrategyHandler {
 
             if (coin.getPrices().get(coin.getPrices().size() - 1) < coin.getCandleSticks_24H()
                     .get(coin.getCandleSticks_24H().size() - 1).getLowPrice()) {
+
                 coin.getCandleSticks_24H().get(coin.getCandleSticks_24H().size() - 1)
                         .setLowPrice(coin.getPrices().get(coin.getPrices().size() - 1));
 
