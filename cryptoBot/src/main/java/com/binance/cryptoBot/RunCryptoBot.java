@@ -54,6 +54,9 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     @Value("${trade.maxLossAllowed}")
     private Double maxLossAllowed;
 
+    @Value("${trade.test.mode}")
+    private Boolean testMode;
+
     private List<Coin> coins = new ArrayList<>();
     private Boolean isInitialized = false;
     private Boolean isTrading = false;
@@ -80,7 +83,8 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
             } else {
 
                 coins = priceService.getAllPrices(coins);
-                coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks_24H(coins);
+                coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks_24H(coins,
+                        isTrading);
 
                 PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin();
                 potentialWinningCoin = strategyHandler.evaluatePotentialWinningCoins();
@@ -94,7 +98,10 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                     isTrading = true;
 
                     do {
-                        winningCoin = priceService.getPrice(winningCoin);
+                        coins = priceService.getAllPrices(coins);
+                        coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks_24H(coins,
+                                isTrading);
+                        winningCoin = priceService.updateWinningCoinPrice(coins, winningCoin);
                         winningCoin = tradeHandler.tradeCoin(winningCoin);
 
                         try {
@@ -109,13 +116,12 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                     LOGGER.info("TOTAL PROFIT: " + totalProfit + "%");
                     LOGGER.info("*****************************************************");
 
-                    emailHandler.sendEmail("Sold Coin: " + winningCoin.getSymbol(),
-                            "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
-
-                    for (Coin coin : coins) {
-                        coin.getHighPriceInactivityWatch().reset();
-                        coin.getHighPriceInactivityWatch().start();
-                        coin.getHighPriceRecords().clear();
+                    if (!testMode) {
+                        emailHandler.sendEmail("Sold Coin: " + winningCoin.getSymbol(),
+                                "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
+                    } else {
+                        emailHandler.sendEmail("Sold Coin (Test Mode): " + winningCoin.getSymbol(),
+                                "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
                     }
 
                     coins = klinesService.getAllCandleSticks_24H(coins);
@@ -142,8 +148,14 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
 
         if (!isTrading) {
             LOGGER.info("Getting candle sticks for new day...");
-            emailHandler.sendEmail("Daily Candle Stick Update",
-                    "Binance Crypto Bot is currently not trading. Updating candle sticks for new day.");
+            if (!testMode) {
+                emailHandler.sendEmail("Daily Candle Stick Update",
+                        "Binance Crypto Bot is currently not trading. Updating candle sticks for new day.");
+            } else {
+                emailHandler.sendEmail("Daily Candle Stick Update (Test Mode)",
+                        "Binance Crypto Bot is currently not trading. Updating candle sticks for new day.");
+            }
+
             coins = klinesService.getAllCandleSticks_24H(coins);
         }
     }

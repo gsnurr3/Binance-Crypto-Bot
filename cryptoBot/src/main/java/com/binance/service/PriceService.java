@@ -15,12 +15,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class PriceService {
 
+    // private static final Logger LOGGER =
+    // LoggerFactory.getLogger(PriceService.class);
+
     @Autowired
     private PriceDTO priceDTO;
 
     public List<Coin> getAllPrices(List<Coin> coins) {
 
         return priceDTO.getAllPrices(coins);
+    }
+
+    public WinningCoin updateWinningCoinPrice(List<Coin> coins, WinningCoin winningCoin) {
+
+        // LOGGER.info("Updating winning coin's current price...");
+
+        for (Coin coin : coins) {
+            if (coin.getSymbol().equals(winningCoin.getSymbol())) {
+                winningCoin.setCurrentPrice(coin.getPrices().get(coin.getPrices().size() - 1));
+                winningCoin.addPrice(winningCoin.getCurrentPrice());
+                winningCoin.setMarginFromCurrentAndHighestPrice(winningCoin.getCurrentPrice(),
+                        winningCoin.getHighestPrice());
+            }
+        }
+
+        return winningCoin;
     }
 
     public WinningCoin getPrice(WinningCoin winningCoin) {

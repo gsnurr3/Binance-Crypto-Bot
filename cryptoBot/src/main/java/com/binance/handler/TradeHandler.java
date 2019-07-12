@@ -56,26 +56,28 @@ public class TradeHandler {
 
     public WinningCoin tradeCoin(WinningCoin winningCoin) {
 
-        if (winningCoin.getProfitSinceBuyPrice() >= 1.75 && diminishingMargin < 0.25) {
-            diminishingMargin = 0.25;
-        }
-        if (winningCoin.getProfitSinceBuyPrice() >= 2.0 && diminishingMargin < 0.50) {
-            diminishingMargin = 0.50;
-        }
-        if (winningCoin.getProfitSinceBuyPrice() >= 2.25 && diminishingMargin < 0.75) {
-            diminishingMargin = 0.75;
-        }
-        if (winningCoin.getProfitSinceBuyPrice() >= 2.5 && diminishingMargin < 1.00) {
-            diminishingMargin = 1.00;
-        }
-        if (winningCoin.getProfitSinceBuyPrice() >= 3.0 && diminishingMargin < 1.25) {
-            diminishingMargin = 1.25;
-        }
-        if (winningCoin.getProfitSinceBuyPrice() >= 4.0 && diminishingMargin < 1.50) {
-            diminishingMargin = 1.50;
-        }
-        if (winningCoin.getProfitSinceBuyPrice() >= 6.0) {
-            diminishingMargin = 0.0;
+        if (winningCoin.isBought()) {
+            if (winningCoin.getProfitSinceBuyPrice() >= 1.75 && diminishingMargin < 0.25) {
+                diminishingMargin = 0.25;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 2.0 && diminishingMargin < 0.50) {
+                diminishingMargin = 0.50;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 2.25 && diminishingMargin < 0.75) {
+                diminishingMargin = 0.75;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 2.5 && diminishingMargin < 1.00) {
+                diminishingMargin = 1.00;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 3.0 && diminishingMargin < 1.25) {
+                diminishingMargin = 1.25;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 4.0 && diminishingMargin < 1.50) {
+                diminishingMargin = 1.50;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 6.0) {
+                diminishingMargin = 0.0;
+            }
         }
 
         if (!winningCoin.isBought()) {
@@ -132,17 +134,21 @@ public class TradeHandler {
             order = new Order();
             order = orderService.postBuyOrder(winningCoin, quantity);
 
-            int count = 0;
-            Double avgPrice = 0.0;
+            Double totalQuantity = 0.0;
+            Double avgWeightedPrice = 0.0;
 
-            for (Fill fill : order.getFills()) {
-                avgPrice = avgPrice + fill.getPrice();
-                count++;
+            if (order.getFills().size() > 1) {
+                for (Fill fill : order.getFills()) {
+                    avgWeightedPrice = avgWeightedPrice + (fill.getPrice() * fill.getQty());
+                    totalQuantity = totalQuantity + fill.getQty();
+                }
+
+                avgWeightedPrice = avgWeightedPrice / totalQuantity;
+            } else {
+                avgWeightedPrice = order.getFills().get(0).getPrice();
             }
 
-            avgPrice = avgPrice / count;
-
-            winningCoin.setBuyPrice(avgPrice);
+            winningCoin.setBuyPrice(avgWeightedPrice);
         } else {
             winningCoin.setBuyPrice(winningCoin.getCurrentPrice());
         }
@@ -183,17 +189,21 @@ public class TradeHandler {
             order = new Order();
             order = orderService.postSellOrder(winningCoin, quantity);
 
-            int count = 0;
-            Double avgPrice = 0.0;
+            Double totalQuantity = 0.0;
+            Double avgWeightedPrice = 0.0;
 
-            for (Fill fill : order.getFills()) {
-                avgPrice = avgPrice + fill.getPrice();
-                count++;
+            if (order.getFills().size() > 1) {
+                for (Fill fill : order.getFills()) {
+                    avgWeightedPrice = avgWeightedPrice + (fill.getPrice() * fill.getQty());
+                    totalQuantity = totalQuantity + fill.getQty();
+                }
+
+                avgWeightedPrice = avgWeightedPrice / totalQuantity;
+            } else {
+                avgWeightedPrice = order.getFills().get(0).getPrice();
             }
 
-            avgPrice = avgPrice / count;
-
-            winningCoin.setSellPrice(avgPrice);
+            winningCoin.setSellPrice(avgWeightedPrice);
         } else {
             winningCoin.setSellPrice(winningCoin.getCurrentPrice());
         }
