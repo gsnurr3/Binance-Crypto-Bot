@@ -28,8 +28,8 @@ public class WinningCoin extends Coin {
 
     }
 
-    public WinningCoin(String symbol, String status, List<Double> prices, List<CandleStick_24H> candleSticks_24H) {
-        super(symbol, status, prices, candleSticks_24H);
+    public WinningCoin(String symbol, String status, List<Double> prices, List<CandleStick_1H> candleSticks_1H, List<CandleStick_24H> candleSticks_24H) {
+        super(symbol, status, prices, candleSticks_1H, candleSticks_24H);
     }
 
     public Double getCurrentPrice() {

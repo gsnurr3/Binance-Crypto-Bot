@@ -3,10 +3,10 @@ package com.binance.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
- * CandleStick_24H
+ * CandleStick_1H
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CandleStick_24H extends CandleStick {
+public class CandleStick_1H extends CandleStick {
 
     @Override
     public String toString() {

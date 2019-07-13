@@ -11,11 +11,12 @@ public class PotentialWinningCoin extends WinningCoin {
     Boolean isHighestPrice = false;
 
     public PotentialWinningCoin() {
-        
+
     }
 
-    public PotentialWinningCoin(String symbol, String status, List<Double> prices, List<CandleStick_24H> candleSticks_24H) {
-        super(symbol, status, prices, candleSticks_24H);
+    public PotentialWinningCoin(String symbol, String status, List<Double> prices, List<CandleStick_1H> candleSticks_1H,
+            List<CandleStick_24H> candleSticks_24H) {
+        super(symbol, status, prices, candleSticks_1H, candleSticks_24H);
     }
 
     public Boolean isLowestPrice() {

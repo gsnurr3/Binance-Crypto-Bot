@@ -1,6 +1,5 @@
 package com.binance.api;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,16 +11,8 @@ public class KlinesAPI extends BaseAPI {
     private final String KLINES_ENDPOINT = getBASE_URL() + "/api/v1/klines";
 
     private String symbol;
-
-    @Value("${klines.interval}")
-    private String interval;
-
     private Long startTime;
     private Long endTime;
-
-    @Value("${klines.limit}")
-    private int limit;
-
     private String queryString;
 
     public String getKLINES_ENDPOINT() {
@@ -34,10 +25,6 @@ public class KlinesAPI extends BaseAPI {
 
     public void ListSymbol(String symbol) {
         this.symbol = symbol;
-    }
-
-    public String getInterval() {
-        return interval;
     }
 
     public Long getStartTime() {
@@ -54,10 +41,6 @@ public class KlinesAPI extends BaseAPI {
 
     public void ListEndTime(Long endTime) {
         this.endTime = endTime;
-    }
-
-    public int getLimit() {
-        return limit;
     }
 
     public String getQueryString() {

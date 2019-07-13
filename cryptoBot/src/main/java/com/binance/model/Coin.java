@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.google.common.base.Stopwatch;
 
 /**
  * CoinModel
@@ -16,19 +15,20 @@ public class Coin {
     private String status;
 
     private List<Double> prices = new ArrayList<>();
+    private List<CandleStick_1H> candleSticks_1H = new ArrayList<>();
     private List<CandleStick_24H> candleSticks_24H = new ArrayList<>();
     private List<HighPriceRecord> highPriceRecords = new ArrayList<>();
-
-    private Stopwatch highPriceInactivityWatch = Stopwatch.createUnstarted();
 
     public Coin() {
 
     }
 
-    public Coin(String symbol, String status, List<Double> prices, List<CandleStick_24H> candleSticks_24H) {
+    public Coin(String symbol, String status, List<Double> prices, List<CandleStick_1H> candleSticks_1H,
+            List<CandleStick_24H> candleSticks_24H) {
         this.symbol = symbol;
         this.status = status;
         this.prices = prices;
+        this.candleSticks_1H = candleSticks_1H;
         this.candleSticks_24H = candleSticks_24H;
     }
 
@@ -66,6 +66,14 @@ public class Coin {
         }
     }
 
+    public List<CandleStick_1H> getCandleSticks_1H() {
+        return candleSticks_1H;
+    }
+
+    public void addCandleSticks_1H(CandleStick_1H candleStick_1H) {
+        this.candleSticks_1H.add(candleStick_1H);
+    }
+
     public List<CandleStick_24H> getCandleSticks_24H() {
         return candleSticks_24H;
     }
@@ -86,25 +94,9 @@ public class Coin {
         this.highPriceRecords.add(highPriceRecord);
     }
 
-    public void setHighPriceInactivityWatch(Stopwatch highPriceInactivityWatch) {
-        this.highPriceInactivityWatch = highPriceInactivityWatch;
-    }
-
-    public Stopwatch getHighPriceInactivityWatch() {
-        return highPriceInactivityWatch;
-    }
-
-    public void startHighPriceInactivityWatch() {
-        this.highPriceInactivityWatch.start();
-    }
-
-    public void stopHighPriceInactivityWatch() {
-        this.highPriceInactivityWatch.stop();
-    }
-
     @Override
     public String toString() {
-        return "Coin [candleSticks_24H=" + candleSticks_24H + ", highPriceInactivityWatch=" + highPriceInactivityWatch
+        return "Coin [candleSticks_1H=" + candleSticks_1H + ", candleSticks_24H=" + candleSticks_24H
                 + ", highPriceRecords=" + highPriceRecords + ", prices=" + prices + ", status=" + status + ", symbol="
                 + symbol + "]";
     }

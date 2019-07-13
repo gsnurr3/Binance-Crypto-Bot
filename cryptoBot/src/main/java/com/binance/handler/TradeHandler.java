@@ -120,17 +120,7 @@ public class TradeHandler {
                     quantity = quantity - 1;
                 }
             }
-        }
 
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        LOGGER.info("UTC Time is: " + dateFormat.format(date));
-        LOGGER.info("******************** BUYING COIN ********************");
-        LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
-
-        if (!testMode) {
             order = new Order();
             order = orderService.postBuyOrder(winningCoin, quantity);
 
@@ -155,6 +145,14 @@ public class TradeHandler {
 
         winningCoin.setProfitSinceBuyPrice();
         winningCoin.setBought(true);
+
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        LOGGER.info("UTC Time is: " + dateFormat.format(date));
+        LOGGER.info("******************** BUYING COIN ********************");
+        LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
     }
 
     public void holdCoin(WinningCoin winningCoin) {
@@ -176,14 +174,6 @@ public class TradeHandler {
     }
 
     public void sellCoin(WinningCoin winningCoin) {
-
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        LOGGER.info("UTC Time is: " + dateFormat.format(date));
-        LOGGER.info("******************* SELLING COIN ********************");
-        LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
 
         if (!testMode) {
             order = new Order();
@@ -208,7 +198,16 @@ public class TradeHandler {
             winningCoin.setSellPrice(winningCoin.getCurrentPrice());
         }
 
+        winningCoin.setProfitSinceBuyPrice();
         winningCoin.setProfit();
         winningCoin.setSold(true);
+
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        LOGGER.info("UTC Time is: " + dateFormat.format(date));
+        LOGGER.info("******************* SELLING COIN ********************");
+        LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
     }
 }

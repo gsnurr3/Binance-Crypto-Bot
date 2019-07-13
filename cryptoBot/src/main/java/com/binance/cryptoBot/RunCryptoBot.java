@@ -75,6 +75,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
         do {
             if (!isInitialized) {
                 coins = exchangeInfoService.getExchangeInfo(coins);
+                coins = klinesService.getAllCandleSticks_1H(coins);
                 coins = klinesService.getAllCandleSticks_24H(coins);
 
                 isInitialized = true;
@@ -93,15 +94,12 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
 
                     WinningCoin winningCoin = new WinningCoin(potentialWinningCoin.getSymbol(),
                             potentialWinningCoin.getStatus(), potentialWinningCoin.getPrices(),
-                            potentialWinningCoin.getCandleSticks_24H());
+                            potentialWinningCoin.getCandleSticks_1H(), potentialWinningCoin.getCandleSticks_24H());
 
                     isTrading = true;
 
                     do {
-                        coins = priceService.getAllPrices(coins);
-                        coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks_24H(coins,
-                                isTrading);
-                        winningCoin = priceService.updateWinningCoinPrice(coins, winningCoin);
+                        winningCoin = priceService.getPrice(winningCoin);
                         winningCoin = tradeHandler.tradeCoin(winningCoin);
 
                         try {
@@ -124,6 +122,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                                 "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
                     }
 
+                    coins = klinesService.getAllCandleSticks_1H(coins);
                     coins = klinesService.getAllCandleSticks_24H(coins);
 
                     isTrading = false;
@@ -143,7 +142,15 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     // E.g. "0 * * * * MON-FRI" means once per minute on weekdays (at the top of the
     // minute - the 0th second).
     // Default 20 0 0 * * *
-    @Scheduled(cron = "20 0 0 * * *", zone = "UTC")
+    @Scheduled(cron = "20 0 * * * *", zone = "UTC")
+    private void updateCandleSticksForNewHour() {
+
+        if (!isTrading) {
+            coins = klinesService.getAllCandleSticks_1H(coins);
+        }
+    }
+
+    @Scheduled(cron = "25 0 0 * * *", zone = "UTC")
     private void updateCandleSticksForNewDay() {
 
         if (!isTrading) {

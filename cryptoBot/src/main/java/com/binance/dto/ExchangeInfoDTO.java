@@ -74,7 +74,6 @@ public class ExchangeInfoDTO {
                     Coin coin = new Coin();
                     coin.setSymbol(symbol.getSymbol());
                     coin.setStatus(symbol.getStatus());
-                    coin.startHighPriceInactivityWatch();
 
                     coins.add(coin);
 

@@ -1,5 +1,6 @@
 package com.binance.strategy;
 
+import com.binance.model.CandleStick_1H;
 import com.binance.model.PotentialWinningCoin;
 
 import org.slf4j.Logger;
@@ -22,57 +23,39 @@ public class BullStrategy {
     // private int highPriceRecordTimeLimit;
 
     // Condition 2
-    // Checks to see if the size of the high price record array meets the high price
-    // record limit
-    public PotentialWinningCoin checkHighPriceRecordSize(PotentialWinningCoin potentialWinningCoin) {
+    // Check if previous day from today is no more a gain than the lowest gain found
+    public PotentialWinningCoin checkIfCandleStick_1HFromPreviousDayIsALoss(PotentialWinningCoin potentialWinningCoin) {
 
-        if (potentialWinningCoin.getHighPriceRecords().size() < highPriceRecordLimit) {
-            LOGGER.info("Condition 2 failed due to high price record size ("
-                    + potentialWinningCoin.getHighPriceRecords().size() + ") being less than limit ("
-                    + highPriceRecordLimit + "). Potential winning coin will be removed from further evaluation: "
-                    + potentialWinningCoin.getSymbol());
-            potentialWinningCoin = null;
+        Double lowestEndOfHourGain = 0.0;
+
+        for (CandleStick_1H candleStick_1H : potentialWinningCoin.getCandleSticks_1H()) {
+            if (potentialWinningCoin.getCandleSticks_1H()
+                    .get(potentialWinningCoin.getCandleSticks_1H().size() - 1) != candleStick_1H) {
+                if (candleStick_1H.getOpenPrice() <= candleStick_1H.getClosePrice()) {
+                    if (lowestEndOfHourGain == 0.0) {
+                        lowestEndOfHourGain = candleStick_1H.getEndOfDayGain();
+                    } else if (candleStick_1H.getEndOfDayGain() < lowestEndOfHourGain) {
+                        lowestEndOfHourGain = candleStick_1H.getEndOfDayGain();
+                    }
+                }
+            }
+        }
+
+        for (CandleStick_1H candleStick_1H : potentialWinningCoin.getCandleSticks_1H()) {
+            if (potentialWinningCoin.getCandleSticks_1H()
+                    .get(potentialWinningCoin.getCandleSticks_1H().size() - 2) == candleStick_1H) {
+
+                LOGGER.info("Prevous candlestick: end of day gain (" + candleStick_1H.getEndOfDayGain()
+                        + ") vs lowest end of hour gain (" + lowestEndOfHourGain + ").");
+                if (candleStick_1H.getEndOfDayGain() > lowestEndOfHourGain) {
+                    LOGGER.info("Condition 2 failed. Potential winning coin will be removed from further evaluation: "
+                            + potentialWinningCoin.getSymbol());
+                    potentialWinningCoin = null;
+                    break;
+                }
+            }
         }
 
         return potentialWinningCoin;
     }
-
-    // Condition 3
-    // Compares the first and last calendar instances to see if the high prices were
-    // recorded in the desired time frame
-    // public PotentialWinningCoin
-    // compareHighPriceRecordFirstIndexAndLastIndexCalendarInstance(
-    // PotentialWinningCoin potentialWinningCoin) {
-
-    // Date d1 =
-    // potentialWinningCoin.getHighPriceRecords().get(0).getTimeStamp().getTime();
-    // Date d2 =
-    // potentialWinningCoin.getHighPriceRecords().get(potentialWinningCoin.getHighPriceRecords().size()
-    // - 1)
-    // .getTimeStamp().getTime();
-
-    // long diffSeconds = 0L;
-
-    // try {
-    // // in milliseconds
-    // long diff = d2.getTime() - d1.getTime();
-
-    // diffSeconds = diff / 1000 % 60;
-    // LOGGER.info("High price records were recorded over (seconds): " +
-    // diffSeconds);
-    // } catch (Exception e) {
-    // emailHandler.sendEmail("Error", "Issue comparing dates in bull strategy. Kill
-    // and check Binance Crypto Bot ASAP!");
-    // e.printStackTrace();
-    // }
-
-    // if (diffSeconds > highPriceRecordTimeLimit) {
-    // LOGGER.info("Condition 3 failed. Potential winning coin will be removed from
-    // further evaluation: "
-    // + potentialWinningCoin.getSymbol());
-    // potentialWinningCoin = null;
-    // }
-
-    // return potentialWinningCoin;
-    // }
 }
