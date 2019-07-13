@@ -32,6 +32,9 @@ public class TradeHandler {
     @Autowired
     private OrderService orderService;
 
+    @Value("${trade.max.time}")
+    private Double maxTradeTime;
+
     @Value("${trade.profitBeforeSelling}")
     private Double profitBeforeSelling;
 
@@ -49,6 +52,8 @@ public class TradeHandler {
     private Order order;
 
     private Double quantity;
+
+    private int maxTradeTimeCounter;
 
     private int holdCoinCount;
 
@@ -82,6 +87,8 @@ public class TradeHandler {
 
         if (!winningCoin.isBought()) {
             buyCoin(winningCoin);
+        } else if (winningCoin.isBought() && maxTradeTimeCounter / 720 >= maxTradeTime) {
+            sellCoin(winningCoin);
         } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() < profitBeforeSelling
                 && winningCoin.getProfitSinceBuyPrice() > lossBeforeSelling) {
             holdCoin(winningCoin);
@@ -100,6 +107,7 @@ public class TradeHandler {
     public void buyCoin(WinningCoin winningCoin) {
 
         diminishingMargin = 0.0;
+        maxTradeTimeCounter = 0;
         holdCoinCount = 0;
 
         if (!testMode) {
@@ -157,6 +165,7 @@ public class TradeHandler {
 
     public void holdCoin(WinningCoin winningCoin) {
 
+        maxTradeTimeCounter++;
         holdCoinCount++;
         winningCoin.setProfitSinceBuyPrice();
 

@@ -84,8 +84,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
             } else {
 
                 coins = priceService.getAllPrices(coins);
-                coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks_24H(coins,
-                        isTrading);
+                coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks(coins, isTrading);
 
                 PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin();
                 potentialWinningCoin = strategyHandler.evaluatePotentialWinningCoins();
@@ -156,14 +155,22 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
         if (!isTrading) {
             LOGGER.info("Getting candle sticks for new day...");
             if (!testMode) {
-                emailHandler.sendEmail("Daily Candle Stick Update",
-                        "Binance Crypto Bot is currently not trading. Updating candle sticks for new day.");
+                emailHandler.sendEmail("Daily Update - Updating Daily Candle Sticks",
+                        "Binance Crypto Bot is currently not trading. Updating daily candle sticks for new day.");
             } else {
-                emailHandler.sendEmail("Daily Candle Stick Update (Test Mode)",
-                        "Binance Crypto Bot is currently not trading. Updating candle sticks for new day.");
+                emailHandler.sendEmail("Daily Update - Updating Daily Candle Sticks (Test Mode)",
+                        "Binance Crypto Bot is currently not trading. Updating daily candle sticks for new day.");
             }
 
             coins = klinesService.getAllCandleSticks_24H(coins);
+        } else {
+            if (!testMode) {
+                emailHandler.sendEmail("Daily Update - Currently Trading",
+                        "Binance Crypto Bot is currently trading, but will update daily candle sticks after trade has complete.");
+            } else {
+                emailHandler.sendEmail("Daily Update - Currently Trading (Test Mode)",
+                        "Binance Crypto Bot is currently trading, but will update daily candle sticks after trade has complete.");
+            }
         }
     }
 }

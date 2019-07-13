@@ -122,8 +122,6 @@ public class KlinesDTO {
                 coin.addCandleSticks_1H(candleStick_1H);
             }
             scanner.close();
-
-            // LOGGER.info(coin.toString());
         }
 
         return coins;
@@ -202,8 +200,6 @@ public class KlinesDTO {
                 coin.addCandleSticks_24H(candleStick_24H);
             }
             scanner.close();
-
-            // LOGGER.info(coin.toString());
         }
 
         return coins;

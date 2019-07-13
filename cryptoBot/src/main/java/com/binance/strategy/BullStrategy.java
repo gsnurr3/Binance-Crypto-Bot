@@ -19,11 +19,8 @@ public class BullStrategy {
     @Value("${bull.strategy.highPriceRecord.limit}")
     private int highPriceRecordLimit;
 
-    // @Value("${bull.strategy.highPriceRecordTime.limit}")
-    // private int highPriceRecordTimeLimit;
-
     // Condition 2
-    // Check if previous day from today is no more a gain than the lowest gain found
+    // Check if previous hour is no more a gain than the lowest gain found
     public PotentialWinningCoin checkIfCandleStick_1HFromPreviousDayIsALoss(PotentialWinningCoin potentialWinningCoin) {
 
         Double lowestEndOfHourGain = 0.0;

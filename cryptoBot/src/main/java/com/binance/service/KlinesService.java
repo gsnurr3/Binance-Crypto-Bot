@@ -16,9 +16,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class KlinesService {
 
-    // private static final Logger LOGGER =
-    // LoggerFactory.getLogger(KlinesService.class);
-
     @Autowired
     private KlinesDTO klinesDTO;
 

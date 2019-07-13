@@ -39,8 +39,6 @@ public class PriceDTO {
 
     public List<Coin> getAllPrices(List<Coin> coins) {
 
-        // LOGGER.info("Scanning all coins on Binance BTC Market...");
-
         ResponseEntity<String> responseEntity = null;
 
         try {
@@ -78,8 +76,6 @@ public class PriceDTO {
 
     public WinningCoin getPrice(WinningCoin winningCoin) {
 
-        // LOGGER.info("Updating winning coin's current price...");
-
         String queryString = "?symbol=" + winningCoin.getSymbol();
 
         ResponseEntity<String> responseEntity = null;
@@ -115,8 +111,6 @@ public class PriceDTO {
     }
 
     public WinningCoin getUSDTPrice(WinningCoin winningCoin) {
-
-        // LOGGER.info("Updating winning coin's current price...");
 
         String queryString = "?symbol=" + winningCoin.getSymbol();
         queryString = queryString.replaceAll("BTC\\b", "USDT");

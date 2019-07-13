@@ -42,8 +42,7 @@ public class StrategyHandler {
     private List<PotentialWinningCoin> potentialWinningCoins = new ArrayList<>();
 
     // Condition 1
-    public List<Coin> checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks_24H(List<Coin> coins,
-            Boolean isTrading) {
+    public List<Coin> checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks(List<Coin> coins, Boolean isTrading) {
 
         for (Coin coin : coins) {
 
@@ -147,18 +146,6 @@ public class StrategyHandler {
                     } else {
                         continue;
                     }
-
-                    // // Condition 2
-                    // potentialWinningCoin =
-                    // bullStrategy.checkIfCandleStick_1HFromPreviousDayIsALoss(potentialCoin);
-
-                    // if (potentialWinningCoin != null) {
-                    // LOGGER.info(
-                    // "Condition 2 passed. Potential winning coin will continue for additional
-                    // evalutation...");
-                    // } else {
-                    // continue;
-                    // }
                 }
 
                 if (potentialCoin.isLowestPrice()) {
@@ -197,8 +184,6 @@ public class StrategyHandler {
             }
         } else {
             potentialWinningCoin = null;
-            // LOGGER.info("No coins have passed condition 1. Will scan coins again
-            // shortly...");
         }
 
         potentialWinningCoins.clear();

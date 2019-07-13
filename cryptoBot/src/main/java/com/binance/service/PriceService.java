@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class PriceService {
 
-    // private static final Logger LOGGER =
-    // LoggerFactory.getLogger(PriceService.class);
-
     @Autowired
     private PriceDTO priceDTO;
 
@@ -27,8 +24,6 @@ public class PriceService {
     }
 
     public WinningCoin updateWinningCoinPrice(List<Coin> coins, WinningCoin winningCoin) {
-
-        // LOGGER.info("Updating winning coin's current price...");
 
         for (Coin coin : coins) {
             if (coin.getSymbol().equals(winningCoin.getSymbol())) {
