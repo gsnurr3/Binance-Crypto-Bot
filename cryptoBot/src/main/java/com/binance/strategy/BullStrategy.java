@@ -125,7 +125,7 @@ public class BullStrategy {
 
         recordHighPriceRecordGains(highPriceRecordGain, potentialWinningCoin);
 
-        if (highPriceRecordGain < highRecordGainLimit) {
+        if (highPriceRecordGain < highRecordGainLimit || highPriceRecordGain < restrictedAmount(potentialWinningCoin)) {
             potentialWinningCoin = null;
         } else {
             BullStrategyCoin bullStrategyCoin = new BullStrategyCoin();
@@ -134,6 +134,17 @@ public class BullStrategy {
         }
 
         return potentialWinningCoin;
+    }
+
+    private Double restrictedAmount(PotentialWinningCoin potentialWinningCoin) {
+
+        Double restrictedAmount = 0.0;
+
+        if (potentialWinningCoin.getSymbol().equals("LINKBTC")) {
+            restrictedAmount = 0.17;
+        }
+
+        return restrictedAmount;
     }
 
     private void recordHighPriceRecordGains(Double highPriceRecordGain, PotentialWinningCoin potentialWinningCoin) {
