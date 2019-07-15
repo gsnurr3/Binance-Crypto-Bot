@@ -61,29 +61,7 @@ public class TradeHandler {
 
     public WinningCoin tradeCoin(WinningCoin winningCoin) {
 
-        if (winningCoin.isBought()) {
-            if (winningCoin.getProfitSinceBuyPrice() >= 1.75 && diminishingMargin < 0.25) {
-                diminishingMargin = 0.25;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 2.0 && diminishingMargin < 0.50) {
-                diminishingMargin = 0.50;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 2.25 && diminishingMargin < 0.75) {
-                diminishingMargin = 0.75;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 2.5 && diminishingMargin < 1.00) {
-                diminishingMargin = 1.00;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 3.0 && diminishingMargin < 1.25) {
-                diminishingMargin = 1.25;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 4.0 && diminishingMargin < 1.50) {
-                diminishingMargin = 1.50;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 6.0) {
-                diminishingMargin = 0.0;
-            }
-        }
+        diminishingMargin = setDiminishingMargin(winningCoin);
 
         if (!winningCoin.isBought()) {
             buyCoin(winningCoin);
@@ -104,7 +82,7 @@ public class TradeHandler {
         return winningCoin;
     }
 
-    public void buyCoin(WinningCoin winningCoin) {
+    private void buyCoin(WinningCoin winningCoin) {
 
         diminishingMargin = 0.0;
         maxTradeTimeCounter = 0;
@@ -163,7 +141,7 @@ public class TradeHandler {
         LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
     }
 
-    public void holdCoin(WinningCoin winningCoin) {
+    private void holdCoin(WinningCoin winningCoin) {
 
         maxTradeTimeCounter++;
         holdCoinCount++;
@@ -182,7 +160,7 @@ public class TradeHandler {
         }
     }
 
-    public void sellCoin(WinningCoin winningCoin) {
+    private void sellCoin(WinningCoin winningCoin) {
 
         if (!testMode) {
             order = new Order();
@@ -218,5 +196,34 @@ public class TradeHandler {
         LOGGER.info("UTC Time is: " + dateFormat.format(date));
         LOGGER.info("******************* SELLING COIN ********************");
         LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
+    }
+
+    private Double setDiminishingMargin(WinningCoin winningCoin) {
+
+        if (winningCoin.isBought()) {
+            if (winningCoin.getProfitSinceBuyPrice() >= 1.00 && diminishingMargin < 0.25) {
+                diminishingMargin = 0.25;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 1.50 && diminishingMargin < 0.50) {
+                diminishingMargin = 0.50;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 2.00 && diminishingMargin < 0.75) {
+                diminishingMargin = 0.75;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 2.50 && diminishingMargin < 1.00) {
+                diminishingMargin = 1.00;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 3.00 && diminishingMargin < 1.25) {
+                diminishingMargin = 1.25;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 3.50 && diminishingMargin < 1.50) {
+                diminishingMargin = 1.50;
+            }
+            if (winningCoin.getProfitSinceBuyPrice() >= 6.0) {
+                diminishingMargin = 0.0;
+            }
+        }
+
+        return diminishingMargin;
     }
 }

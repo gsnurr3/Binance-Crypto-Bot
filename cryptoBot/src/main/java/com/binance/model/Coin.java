@@ -91,6 +91,7 @@ public class Coin {
     }
 
     public void addHighPriceRecord(HighPriceRecord highPriceRecord) {
+
         this.highPriceRecords.add(highPriceRecord);
     }
 

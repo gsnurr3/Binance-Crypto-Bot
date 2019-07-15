@@ -49,9 +49,6 @@ public class BearStrategy {
             if (potentialWinningCoin.getCandleSticks_24H()
                     .get(potentialWinningCoin.getCandleSticks_24H().size() - 2) == candleStick_24H) {
                 if (candleStick_24H.getEndOfDayGain() > lowestEndOfDayGain) {
-
-                    LOGGER.info("Condition 2 failed. Potential winning coin will be removed from further evaluation: "
-                            + potentialWinningCoin.getSymbol());
                     potentialWinningCoin = null;
                     break;
                 }
@@ -99,8 +96,6 @@ public class BearStrategy {
         }
 
         if (count >= 4) {
-            LOGGER.info("Condition 3 failed. Potential winning coin will be removed from further evaluation: "
-                    + potentialWinningCoin.getSymbol());
             potentialWinningCoin = null;
         }
 
@@ -141,18 +136,12 @@ public class BearStrategy {
                     LOGGER.info("Todays loss: " + todaysLoss + ", Lowest end of day loss: " + lowestEndOfDayLoss);
 
                     if (todaysLoss > lowestEndOfDayLoss) {
-
-                        LOGGER.info(
-                                "Condition 4 failed. Potential winning coin will be removed from further evaluation: "
-                                        + potentialWinningCoin.getSymbol());
                         potentialWinningCoin = null;
                         break;
                     }
                 }
             }
         } else {
-            LOGGER.info("Condition 4 failed. Potential winning coin will be removed from further evaluation: "
-                    + potentialWinningCoin.getSymbol());
             potentialWinningCoin = null;
         }
 
@@ -174,7 +163,7 @@ public class BearStrategy {
 
         StringBuilder data = new StringBuilder();
 
-        data.append("End of Day Difference Data (Bottom Out Strategy):");
+        data.append("End of Day Difference Data (Bear Strategy):");
 
         for (Double endOfDayDifference : endOfDayDifferences) {
             data.append(" [ " + endOfDayDifference + " ] ");
@@ -183,7 +172,7 @@ public class BearStrategy {
         LOGGER.info(data.toString());
     }
 
-    @Scheduled(cron = "25 0 0 * * *", zone = "UTC")
+    @Scheduled(cron = "30 0 0 * * *", zone = "UTC")
     private void resetBearData() {
 
         endOfDayDifferences.clear();

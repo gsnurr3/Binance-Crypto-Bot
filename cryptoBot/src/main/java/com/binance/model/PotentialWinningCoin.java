@@ -10,6 +10,8 @@ public class PotentialWinningCoin extends WinningCoin {
     Boolean isLowestPrice = false;
     Boolean isHighestPrice = false;
 
+    String message;
+
     public PotentialWinningCoin() {
 
     }
@@ -33,5 +35,19 @@ public class PotentialWinningCoin extends WinningCoin {
 
     public void setIsHighestPrice(Boolean isHighestPrice) {
         this.isHighestPrice = isHighestPrice;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    @Override
+    public String toString() {
+        return "PotentialWinningCoin [isHighestPrice=" + isHighestPrice + ", isLowestPrice=" + isLowestPrice
+                + ", message=" + message + "]";
     }
 }

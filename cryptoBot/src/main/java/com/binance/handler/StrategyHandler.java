@@ -2,7 +2,6 @@ package com.binance.handler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.binance.model.Coin;
 import com.binance.model.HighPriceRecord;
@@ -30,9 +29,6 @@ public class StrategyHandler {
     @Value("${bull.strategy.highPriceRecord.limit}")
     private int highPriceRecordLimit;
 
-    @Value("${bull.strategy.highPriceRecordTime.limit}")
-    private int highPriceRecordTimeLimit;
-
     @Autowired
     private BullStrategy bullStrategy;
 
@@ -51,12 +47,8 @@ public class StrategyHandler {
 
                 coin.getCandleSticks_24H().get(coin.getCandleSticks_24H().size() - 1)
                         .setHighPrice(coin.getPrices().get(coin.getPrices().size() - 1));
-
-                LOGGER.info("Updating daily highest price to " + coin.getPrices().get(coin.getPrices().size() - 1)
-                        + " for " + coin.getSymbol());
             }
 
-            // TO DO: Some of this needs moved to bull strategy
             if (coin.getPrices().get(coin.getPrices().size() - 1) > coin.getCandleSticks_1H()
                     .get(coin.getCandleSticks_1H().size() - 1).getHighPrice()) {
 
@@ -66,34 +58,24 @@ public class StrategyHandler {
                 coin.getCandleSticks_1H().get(coin.getCandleSticks_1H().size() - 1)
                         .setHighPrice(coin.getPrices().get(coin.getPrices().size() - 1));
 
-                coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
+                if (coin.getHighPriceRecords().size() < highPriceRecordLimit
+                        || coin.getHighPriceRecords().size() == 0) {
+                    coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
+                } else {
+                    coin.getHighPriceRecords().remove(0);
+                    coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
+                }
 
-                long totalTimeInSeconds = 0;
-                if (coin.getHighPriceRecords().size() >= 1) {
+                if (!isTrading) {
+                    LOGGER.info("Condition 1 passed. Adding coin to potential winning coins for further evaluation: "
+                            + coin.getSymbol());
 
-                    totalTimeInSeconds = coin.getHighPriceRecords().get(0).getStopwatch().elapsed(TimeUnit.SECONDS);
+                    PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
+                            coin.getStatus(), coin.getPrices(), coin.getCandleSticks_1H(), coin.getCandleSticks_24H());
+                    potentialWinningCoin.setIsHighestPrice(true);
+                    potentialWinningCoin.setHighPriceRecords(coin.getHighPriceRecords());
 
-                    if (totalTimeInSeconds > highPriceRecordTimeLimit) {
-                        LOGGER.info("Total time (" + totalTimeInSeconds
-                                + ") for records exceeded high price record time limit (" + highPriceRecordTimeLimit
-                                + "). Restarting stopwatch and clearing high price records for: " + coin.getSymbol());
-                        coin.getHighPriceRecords().clear();
-                    } else {
-                        if (!isTrading) {
-                            if (coin.getHighPriceRecords().size() >= highPriceRecordLimit) {
-                                LOGGER.info(
-                                        "Condition 1 passed. Adding coin to potential winning coins for further evaluation...");
-
-                                PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
-                                        coin.getStatus(), coin.getPrices(), coin.getCandleSticks_1H(),
-                                        coin.getCandleSticks_24H());
-                                potentialWinningCoin.setIsHighestPrice(true);
-                                potentialWinningCoin.setHighPriceRecords(coin.getHighPriceRecords());
-
-                                potentialWinningCoins.add(potentialWinningCoin);
-                            }
-                        }
-                    }
+                    potentialWinningCoins.add(potentialWinningCoin);
                 }
             }
 
@@ -103,13 +85,14 @@ public class StrategyHandler {
                 coin.getCandleSticks_24H().get(coin.getCandleSticks_24H().size() - 1)
                         .setLowPrice(coin.getPrices().get(coin.getPrices().size() - 1));
 
-                LOGGER.info("Updating lowest price to " + coin.getPrices().get(coin.getPrices().size() - 1) + " for "
-                        + coin.getSymbol());
+                LOGGER.info("Updating daily lowest price to " + coin.getPrices().get(coin.getPrices().size() - 1)
+                        + " for " + coin.getSymbol());
 
                 if (!isTrading) {
                     if (coin.getCandleSticks_24H().size() == dayLimit) {
                         LOGGER.info(
-                                "Condition 1 passed. Adding coin to potential winning coins for further evaluation...");
+                                "Condition 1 passed. Adding coin to potential winning coins for further evaluation: "
+                                        + coin.getSymbol());
 
                         PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
                                 coin.getStatus(), coin.getPrices(), coin.getCandleSticks_1H(),
@@ -128,20 +111,52 @@ public class StrategyHandler {
 
     public PotentialWinningCoin evaluatePotentialWinningCoins() {
 
+        String message = "";
         PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin();
 
         if (potentialWinningCoins.size() >= 1) {
 
             for (PotentialWinningCoin potentialCoin : potentialWinningCoins) {
 
+                if (!message.isEmpty()) {
+                    LOGGER.info(message);
+                }
+
                 if (potentialCoin.isHighestPrice()) {
 
                     // Condition 2
+                    potentialWinningCoin = bullStrategy.checkIfCoinIsTradable(potentialCoin);
+
+                    if (potentialWinningCoin == null) {
+                        message = "Condition 2 failed. Potential winning coin will be removed from further evaluation: "
+                                + potentialCoin.getSymbol();
+                        continue;
+                    }
+
+                    // Condition 3
                     potentialWinningCoin = bullStrategy.checkIfCandleStick_1HFromPreviousDayIsALoss(potentialCoin);
 
+                    if (potentialWinningCoin == null) {
+                        message = "Condition 3 failed. Potential winning coin will be removed from further evaluation: "
+                                + potentialCoin.getSymbol();
+                        continue;
+                    }
+
+                    // Condition 4
+                    potentialWinningCoin = bullStrategy.checkHighPriceRecordTimeLimit(potentialCoin);
+
+                    if (potentialWinningCoin == null) {
+                        message = "Condition 4 failed. Potential winning coin will be removed from further evaluation: "
+                                + potentialCoin.getSymbol();
+                        continue;
+                    }
+
+                    // Condition 5
+                    potentialWinningCoin = bullStrategy.checkHighPriceRecordsForSignificantGain(potentialCoin);
+
                     if (potentialWinningCoin != null) {
-                        LOGGER.info("Condition 2 passed. All conditions passed. Buying " + potentialCoin.getSymbol()
-                                + " !!!");
+                        potentialWinningCoin.setMessage("Condition 5 passed. All conditions passed. Buying "
+                                + potentialWinningCoin.getSymbol() + " !!!");
                         break;
                     } else {
                         continue;
@@ -153,20 +168,18 @@ public class StrategyHandler {
                     // Condition 2
                     potentialWinningCoin = bearStrategy.checkCandleStick_24HFromPreviousDay(potentialCoin);
 
-                    if (potentialWinningCoin != null) {
-                        LOGGER.info(
-                                "Condition 2 passed. Potential winning coin will continue for additional evalutation...");
-                    } else {
+                    if (potentialWinningCoin == null) {
+                        message = "Condition 2 failed. Potential winning coin will be removed from further evaluation: "
+                                + potentialCoin.getSymbol();
                         continue;
                     }
 
                     // Condition 3
                     potentialWinningCoin = bearStrategy.checkIfCoinMarketIsTooBear(potentialCoin);
 
-                    if (potentialWinningCoin != null) {
-                        LOGGER.info(
-                                "Condition 3 passed. Potential winning coin will continue for additional evalutation...");
-                    } else {
+                    if (potentialWinningCoin == null) {
+                        message = "Condition 3 failed. Potential winning coin will be removed from further evaluation: "
+                                + potentialCoin.getSymbol();
                         continue;
                     }
 
@@ -174,8 +187,8 @@ public class StrategyHandler {
                     potentialWinningCoin = bearStrategy.checkIfTodaysCandleStick_24HIsANewLowRecord(potentialCoin);
 
                     if (potentialWinningCoin != null) {
-                        LOGGER.info("Condition 4 passed. All conditions passed. Buying " + potentialCoin.getSymbol()
-                                + " !!!");
+                        potentialWinningCoin.setMessage("Condition 4 passed. All conditions passed. Buying "
+                                + potentialWinningCoin.getSymbol() + " !!!");
                         break;
                     } else {
                         continue;
@@ -184,6 +197,10 @@ public class StrategyHandler {
             }
         } else {
             potentialWinningCoin = null;
+        }
+
+        if (!message.isEmpty()) {
+            LOGGER.info(message);
         }
 
         potentialWinningCoins.clear();
