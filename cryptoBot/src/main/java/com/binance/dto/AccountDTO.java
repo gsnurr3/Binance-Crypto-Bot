@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 
 import com.binance.api.AccountAPI;
-import com.binance.handler.EmailHandler;
 import com.binance.helper.RestTemplateHelper;
 import com.binance.model.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,10 +29,8 @@ public class AccountDTO {
     @Autowired
     private RestTemplateHelper restTemplateHelper;
 
-    @Autowired
-    private EmailHandler emailhandler;
-
-    public Account getAccountInfo() {
+    public Account getAccountInfo()
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
 
         LOGGER.info("Retrieving account information...");
 
@@ -47,27 +44,14 @@ public class AccountDTO {
 
         ResponseEntity<String> responseEntity = null;
 
-        try {
-            responseEntity = restTemplateHelper.getResponseEntitySHA256String(
-                    accountAPI.getACCOUNT_ENDPOINT() + queryString, accountAPI.getApiKey());
-        } catch (ResourceAccessException | SocketTimeoutException e) {
-            LOGGER.error(e.toString());
-            
-        } catch (Exception e) {
-            emailhandler.sendEmail("Error", e.toString());
-        }
+        responseEntity = restTemplateHelper
+                .getResponseEntitySHA256String(accountAPI.getACCOUNT_ENDPOINT() + queryString, accountAPI.getApiKey());
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         Account account = new Account();
 
-        try {
-            account = objectMapper.readValue(responseEntity.getBody(), Account.class);
-        } catch (IOException | NullPointerException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (Exception e) {
-            emailhandler.sendEmail("Error", e.toString());
-        }
+        account = objectMapper.readValue(responseEntity.getBody(), Account.class);
 
         return account;
     }

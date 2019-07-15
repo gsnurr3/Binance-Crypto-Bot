@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.SocketTimeoutException;
 
 import com.binance.api.OrderAPI;
-import com.binance.handler.EmailHandler;
 import com.binance.helper.RestTemplateHelper;
 import com.binance.model.Order;
 import com.binance.model.WinningCoin;
@@ -31,9 +30,6 @@ public class OrderDTO {
     @Autowired
     private RestTemplateHelper restTemplateHelper;
 
-    @Autowired
-    private EmailHandler emailhandler;
-
     enum side {
         BUY, SELL;
     }
@@ -52,7 +48,8 @@ public class OrderDTO {
         GTC, IOC, FOK;
     }
 
-    public Order postBuyOrder(WinningCoin winningCoin, Double quantity) {
+    public Order postBuyOrder(WinningCoin winningCoin, Double quantity)
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
 
         LOGGER.info("Placing buy order for " + winningCoin.getSymbol() + "...");
 
@@ -70,34 +67,21 @@ public class OrderDTO {
 
         ResponseEntity<String> responseEntity = null;
 
-        try {
-            responseEntity = restTemplateHelper
-                    .postResponseEntitySHA256String(orderAPI.getORDER_ENDPOINT() + queryString, orderAPI.getApiKey());
-        } catch (ResourceAccessException | SocketTimeoutException e) {
-            LOGGER.error(e.getMessage(), e);
-            emailhandler.sendEmail("Error", e.toString());
-        } catch (Exception e) {
-            emailhandler.sendEmail("Error", e.toString());
-        }
+        responseEntity = restTemplateHelper.postResponseEntitySHA256String(orderAPI.getORDER_ENDPOINT() + queryString,
+                orderAPI.getApiKey());
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         Order order = new Order();
 
-        try {
-            order = objectMapper.readValue(responseEntity.getBody(), Order.class);
-            LOGGER.info(order.toString());
-        } catch (IOException | NullPointerException e) {
-            LOGGER.error(e.getMessage(), e);
-            emailhandler.sendEmail("Error", e.toString());
-        } catch (Exception e) {
-            emailhandler.sendEmail("Error", e.toString());
-        }
+        order = objectMapper.readValue(responseEntity.getBody(), Order.class);
+        LOGGER.info(order.toString());
 
         return order;
     }
 
-    public Order postSellOrder(WinningCoin winningCoin, Double quantity) {
+    public Order postSellOrder(WinningCoin winningCoin, Double quantity)
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
 
         LOGGER.info("Placing sell order for " + winningCoin.getSymbol() + "...");
 
@@ -115,29 +99,15 @@ public class OrderDTO {
 
         ResponseEntity<String> responseEntity = null;
 
-        try {
-            responseEntity = restTemplateHelper
-                    .postResponseEntitySHA256String(orderAPI.getORDER_ENDPOINT() + queryString, orderAPI.getApiKey());
-        } catch (ResourceAccessException | SocketTimeoutException e) {
-            LOGGER.error(e.getMessage(), e);
-            emailhandler.sendEmail("Error", e.toString());
-        } catch (Exception e) {
-            emailhandler.sendEmail("Error", e.toString());
-        }
+        responseEntity = restTemplateHelper.postResponseEntitySHA256String(orderAPI.getORDER_ENDPOINT() + queryString,
+                orderAPI.getApiKey());
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         Order order = new Order();
 
-        try {
-            order = objectMapper.readValue(responseEntity.getBody(), Order.class);
-            LOGGER.info(order.toString());
-        } catch (IOException | NullPointerException e) {
-            LOGGER.error(e.getMessage(), e);
-            emailhandler.sendEmail("Error", e.toString());
-        } catch (Exception e) {
-            emailhandler.sendEmail("Error", e.toString());
-        }
+        order = objectMapper.readValue(responseEntity.getBody(), Order.class);
+        LOGGER.info(order.toString());
 
         return order;
     }

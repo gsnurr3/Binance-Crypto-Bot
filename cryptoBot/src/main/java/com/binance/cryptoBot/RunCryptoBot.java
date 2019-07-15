@@ -1,5 +1,6 @@
 package com.binance.cryptoBot;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -65,15 +66,16 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
-        Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-        LOGGER.info("UTC Time is: " + dateFormat.format(date));
-        LOGGER.info("Binance Crypto Bot starting...");
-
         do {
             if (!isInitialized) {
+
+                Date date = new Date();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+                dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+                LOGGER.info("UTC Time is: " + dateFormat.format(date));
+                LOGGER.info("Binance Crypto Bot starting...");
+
                 coins = exchangeInfoService.getExchangeInfo(coins);
                 coins = klinesService.getAllCandleSticks_1H(coins);
                 coins = klinesService.getAllCandleSticks_24H(coins);
@@ -99,7 +101,14 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
 
                     do {
                         winningCoin = priceService.getPrice(winningCoin);
-                        winningCoin = tradeHandler.tradeCoin(winningCoin);
+
+                        try {
+                            winningCoin = tradeHandler.tradeCoin(winningCoin);
+                        } catch (IOException | NullPointerException e) {
+                            LOGGER.error(e.toString());
+                            emailHandler.sendEmail("Error", e.toString());
+                            this.onApplicationEvent(event);
+                        }
 
                         try {
                             Thread.sleep(5000);

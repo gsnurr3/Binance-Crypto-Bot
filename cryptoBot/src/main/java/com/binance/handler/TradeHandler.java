@@ -1,5 +1,7 @@
 package com.binance.handler;
 
+import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 
 /**
  * TradeService
@@ -31,6 +34,9 @@ public class TradeHandler {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private EmailHandler emailHandler;
 
     @Value("${trade.max.time}")
     private Double maxTradeTime;
@@ -59,7 +65,8 @@ public class TradeHandler {
 
     private Double diminishingMargin;
 
-    public WinningCoin tradeCoin(WinningCoin winningCoin) {
+    public WinningCoin tradeCoin(WinningCoin winningCoin)
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
 
         diminishingMargin = setDiminishingMargin(winningCoin);
 
@@ -82,7 +89,8 @@ public class TradeHandler {
         return winningCoin;
     }
 
-    private void buyCoin(WinningCoin winningCoin) {
+    private void buyCoin(WinningCoin winningCoin)
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
 
         diminishingMargin = 0.0;
         maxTradeTimeCounter = 0;
@@ -164,7 +172,20 @@ public class TradeHandler {
 
         if (!testMode) {
             order = new Order();
-            order = orderService.postSellOrder(winningCoin, quantity);
+
+            try {
+                order = orderService.postSellOrder(winningCoin, quantity);
+            } catch (IOException | NullPointerException e) {
+                LOGGER.error(e.toString());
+                emailHandler.sendEmail("Error", e.toString());
+
+                try {
+                    Thread.sleep(5000);
+                    sellCoin(winningCoin);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
 
             Double totalQuantity = 0.0;
             Double avgWeightedPrice = 0.0;
@@ -201,25 +222,16 @@ public class TradeHandler {
     private Double setDiminishingMargin(WinningCoin winningCoin) {
 
         if (winningCoin.isBought()) {
-            if (winningCoin.getProfitSinceBuyPrice() >= 1.00 && diminishingMargin < 0.25) {
-                diminishingMargin = 0.25;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 1.50 && diminishingMargin < 0.50) {
+            if (winningCoin.getProfitSinceBuyPrice() >= 1.00 && diminishingMargin < 0.50) {
                 diminishingMargin = 0.50;
             }
-            if (winningCoin.getProfitSinceBuyPrice() >= 2.00 && diminishingMargin < 0.75) {
-                diminishingMargin = 0.75;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 2.50 && diminishingMargin < 1.00) {
+            if (winningCoin.getProfitSinceBuyPrice() >= 1.50 && diminishingMargin < 1.00) {
                 diminishingMargin = 1.00;
             }
-            if (winningCoin.getProfitSinceBuyPrice() >= 3.00 && diminishingMargin < 1.25) {
-                diminishingMargin = 1.25;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 3.50 && diminishingMargin < 1.50) {
+            if (winningCoin.getProfitSinceBuyPrice() >= 2.00 && diminishingMargin < 1.50) {
                 diminishingMargin = 1.50;
             }
-            if (winningCoin.getProfitSinceBuyPrice() >= 6.0) {
+            if (winningCoin.getProfitSinceBuyPrice() >= 6.00) {
                 diminishingMargin = 0.0;
             }
         }

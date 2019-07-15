@@ -29,6 +29,9 @@ public class StrategyHandler {
     @Value("${bull.strategy.highPriceRecord.limit}")
     private int highPriceRecordLimit;
 
+    @Value("${bear.strategy.minPriceAllowedOfCoin}")
+    private Double minPriceAllowedOfCoin;
+
     @Autowired
     private BullStrategy bullStrategy;
 
@@ -89,7 +92,8 @@ public class StrategyHandler {
                         + " for " + coin.getSymbol());
 
                 if (!isTrading) {
-                    if (coin.getCandleSticks_24H().size() == dayLimit) {
+                    if (coin.getCandleSticks_24H().size() == dayLimit
+                            && coin.getPrices().get(coin.getPrices().size() - 1) >= minPriceAllowedOfCoin) {
                         LOGGER.info(
                                 "Condition 1 passed. Adding coin to potential winning coins for further evaluation: "
                                         + coin.getSymbol());
