@@ -96,6 +96,8 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                     WinningCoin winningCoin = new WinningCoin(potentialWinningCoin.getSymbol(),
                             potentialWinningCoin.getStatus(), potentialWinningCoin.getPrices(),
                             potentialWinningCoin.getCandleSticks_1H(), potentialWinningCoin.getCandleSticks_24H());
+                    winningCoin.setisBull(potentialWinningCoin.isBull());
+                    winningCoin.setisBear(potentialWinningCoin.isBear());
 
                     isTrading = true;
 

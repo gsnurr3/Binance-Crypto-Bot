@@ -23,12 +23,15 @@ public class WinningCoin extends Coin {
     private Double profitSinceBuyPrice;
     private Boolean isBought = false;
     private Boolean isSold = false;
+    private Boolean isBear = false;
+    private Boolean isBull = false;
 
     public WinningCoin() {
 
     }
 
-    public WinningCoin(String symbol, String status, List<Double> prices, List<CandleStick_1H> candleSticks_1H, List<CandleStick_24H> candleSticks_24H) {
+    public WinningCoin(String symbol, String status, List<Double> prices, List<CandleStick_1H> candleSticks_1H,
+            List<CandleStick_24H> candleSticks_24H) {
         super(symbol, status, prices, candleSticks_1H, candleSticks_24H);
     }
 
@@ -120,11 +123,28 @@ public class WinningCoin extends Coin {
         this.isSold = isSold;
     }
 
+    public Boolean isBear() {
+        return isBear;
+    }
+
+    public void setisBear(Boolean isBear) {
+        this.isBear = isBear;
+    }
+
+    public Boolean isBull() {
+        return isBull;
+    }
+
+    public void setisBull(Boolean isBull) {
+        this.isBull = isBull;
+    }
+
     @Override
     public String toString() {
         return "WinningCoin [buyPrice=" + buyPrice + ", currentPrice=" + currentPrice + ", highestPrice=" + highestPrice
-                + ", isBought=" + isBought + ", isSold=" + isSold + ", marginFromCurrentAndHighestPrice="
-                + marginFromCurrentAndHighestPrice + ", profit=" + profit + ", profitSinceBuyPrice="
-                + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", usdtPrice=" + usdtPrice + "]";
+                + ", isBear=" + isBear + ", isBought=" + isBought + ", isBull=" + isBull + ", isSold=" + isSold
+                + ", marginFromCurrentAndHighestPrice=" + marginFromCurrentAndHighestPrice + ", profit=" + profit
+                + ", profitSinceBuyPrice=" + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", usdtPrice="
+                + usdtPrice + "]";
     }
 }

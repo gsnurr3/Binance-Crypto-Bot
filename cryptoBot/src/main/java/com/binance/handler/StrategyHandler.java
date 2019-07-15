@@ -75,7 +75,7 @@ public class StrategyHandler {
 
                     PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
                             coin.getStatus(), coin.getPrices(), coin.getCandleSticks_1H(), coin.getCandleSticks_24H());
-                    potentialWinningCoin.setIsHighestPrice(true);
+                    potentialWinningCoin.setisBull(true);
                     potentialWinningCoin.setHighPriceRecords(coin.getHighPriceRecords());
 
                     potentialWinningCoins.add(potentialWinningCoin);
@@ -101,7 +101,7 @@ public class StrategyHandler {
                         PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
                                 coin.getStatus(), coin.getPrices(), coin.getCandleSticks_1H(),
                                 coin.getCandleSticks_24H());
-                        potentialWinningCoin.setIsLowestPrice(true);
+                        potentialWinningCoin.setisBear(true);
 
                         potentialWinningCoins.add(potentialWinningCoin);
                     }
@@ -126,7 +126,7 @@ public class StrategyHandler {
                     LOGGER.info(message);
                 }
 
-                if (potentialCoin.isHighestPrice()) {
+                if (potentialCoin.isBull()) {
 
                     // Condition 2
                     potentialWinningCoin = bullStrategy.checkIfCoinIsTradable(potentialCoin);
@@ -167,7 +167,7 @@ public class StrategyHandler {
                     }
                 }
 
-                if (potentialCoin.isLowestPrice()) {
+                if (potentialCoin.isBear()) {
 
                     // Condition 2
                     potentialWinningCoin = bearStrategy.checkCandleStick_24HFromPreviousDay(potentialCoin);

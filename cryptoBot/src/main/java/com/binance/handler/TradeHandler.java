@@ -44,8 +44,11 @@ public class TradeHandler {
     @Value("${trade.profitBeforeSelling}")
     private Double profitBeforeSelling;
 
-    @Value("${trade.lossBeforeSelling}")
-    private Double lossBeforeSelling;
+    @Value("${trade.isBull.lossBeforeSelling}")
+    private Double isBullLossBeforeSelling;
+
+    @Value("${trade.isBear.lossBeforeSelling}")
+    private Double isBearLossingBeforeSelling;
 
     @Value("${trade.marginFromCurrentAndHighestPrice}")
     private Double marginFromCurrentAndHighestPrice;
@@ -69,6 +72,14 @@ public class TradeHandler {
             throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
 
         diminishingMargin = setDiminishingMargin(winningCoin);
+
+        Double lossBeforeSelling = 0.0;
+
+        if (winningCoin.isBull()) {
+            lossBeforeSelling = isBullLossBeforeSelling;
+        } else if (winningCoin.isBear()) {
+            lossBeforeSelling = isBearLossingBeforeSelling;
+        }
 
         if (!winningCoin.isBought()) {
             buyCoin(winningCoin);
