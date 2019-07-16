@@ -123,11 +123,10 @@ public class BullStrategy {
                     / potentialWinningCoin.getHighPriceRecords().get(0).getHighPrice()) * 100;
         }
 
-        recordHighPriceRecordGains(highPriceRecordGain, potentialWinningCoin);
-
         if (highPriceRecordGain < highRecordGainLimit || highPriceRecordGain < restrictedAmount(potentialWinningCoin)) {
             potentialWinningCoin = null;
         } else {
+            recordHighPriceRecordGains(highPriceRecordGain, potentialWinningCoin);
             BullStrategyCoin bullStrategyCoin = new BullStrategyCoin();
             bullStrategyCoin.setSymbol(potentialWinningCoin.getSymbol());
             bullStrategyCoins.add(bullStrategyCoin);
