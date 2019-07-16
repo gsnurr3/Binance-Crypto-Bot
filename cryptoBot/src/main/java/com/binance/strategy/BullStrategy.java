@@ -140,7 +140,7 @@ public class BullStrategy {
         Double restrictedAmount = 0.0;
 
         if (potentialWinningCoin.getSymbol().equals("LINKBTC")) {
-            restrictedAmount = 0.17;
+            restrictedAmount = 0.52;
         }
 
         return restrictedAmount;
