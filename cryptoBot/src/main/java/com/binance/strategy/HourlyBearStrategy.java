@@ -6,12 +6,14 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.binance.cryptoBot.RunCryptoBot;
+import com.binance.handler.EmailHandler;
 import com.binance.model.CandleStick_1H;
 import com.binance.model.PotentialWinningCoin;
 import com.binance.model.StrategyCoinWatcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,9 @@ import org.springframework.stereotype.Component;
 public class HourlyBearStrategy {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HourlyBearStrategy.class);
+
+    @Autowired
+    EmailHandler emailHandler;
 
     private List<Double> endOfHourDifferences = new ArrayList<>();
 
@@ -167,6 +172,9 @@ public class HourlyBearStrategy {
                     if (dynamicEndOfHourLossRecord != 0.0) {
                         Double currentChange = record - dynamicEndOfHourLossRecord;
                         if (currentChange > maxChangeAllowed) {
+                            emailHandler.sendEmail("Stat Report", "(HourlyBearStrategy) Current change was "
+                                    + currentChange + " vs max change allowed of " + maxChangeAllowed + ".");
+
                             LOGGER.info("Coin is too volatile. Not buying. Current change: " + currentChange
                                     + ", Max Change Allowed: " + maxChangeAllowed + ".");
                             potentialWinningCoin = null;
