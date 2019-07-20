@@ -23,8 +23,9 @@ public class WinningCoin extends Coin {
     private Double profitSinceBuyPrice;
     private Boolean isBought = false;
     private Boolean isSold = false;
-    private Boolean isBear = false;
-    private Boolean isBull = false;
+    private Boolean isHourlyBull = false;
+    private Boolean isHourlyBear = false;
+    private Boolean isDailyBear = false;
 
     public WinningCoin() {
 
@@ -123,28 +124,36 @@ public class WinningCoin extends Coin {
         this.isSold = isSold;
     }
 
-    public Boolean isBear() {
-        return isBear;
+    public Boolean isHourlyBull() {
+        return isHourlyBull;
     }
 
-    public void setisBear(Boolean isBear) {
-        this.isBear = isBear;
+    public void setIsHourlyBull(Boolean isHourlyBull) {
+        this.isHourlyBull = isHourlyBull;
     }
 
-    public Boolean isBull() {
-        return isBull;
+    public Boolean isHourlyBear() {
+        return isHourlyBear;
     }
 
-    public void setisBull(Boolean isBull) {
-        this.isBull = isBull;
+    public void setIsHourlyBear(Boolean isHourlyBear) {
+        this.isHourlyBear = isHourlyBear;
+    }
+
+    public Boolean isDailyBear() {
+        return isDailyBear;
+    }
+
+    public void setIsDailyBear(Boolean isDailyBear) {
+        this.isDailyBear = isDailyBear;
     }
 
     @Override
     public String toString() {
         return "WinningCoin [buyPrice=" + buyPrice + ", currentPrice=" + currentPrice + ", highestPrice=" + highestPrice
-                + ", isBear=" + isBear + ", isBought=" + isBought + ", isBull=" + isBull + ", isSold=" + isSold
-                + ", marginFromCurrentAndHighestPrice=" + marginFromCurrentAndHighestPrice + ", profit=" + profit
-                + ", profitSinceBuyPrice=" + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", usdtPrice="
-                + usdtPrice + "]";
+                + ", isBought=" + isBought + ", isDailyBear=" + isDailyBear + ", isHourlyBear=" + isHourlyBear
+                + ", isHourlyBull=" + isHourlyBull + ", isSold=" + isSold + ", marginFromCurrentAndHighestPrice="
+                + marginFromCurrentAndHighestPrice + ", profit=" + profit + ", profitSinceBuyPrice="
+                + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", usdtPrice=" + usdtPrice + "]";
     }
 }

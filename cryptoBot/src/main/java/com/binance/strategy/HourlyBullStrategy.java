@@ -15,28 +15,28 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * BullStrategy
+ * HourlyBullStrategy
  */
 @Component
-public class BullStrategy {
+public class HourlyBullStrategy {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BullStrategy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(HourlyBullStrategy.class);
 
-    @Value("${bull.strategy.highRecordGain.limit}")
+    @Value("${hourly.bull.strategy.highRecordGain.limit}")
     private Double highRecordGainLimit;
 
-    @Value("${bull.strategy.highPriceRecord.limit}")
+    @Value("${hourly.bull.strategy.highPriceRecord.limit}")
     private int highPriceRecordLimit;
 
-    @Value("${bull.strategy.highPriceRecordTime.limit}")
+    @Value("${hourly.bull.strategy.highPriceRecordTime.limit}")
     private int highPriceRecordTimeLimit;
 
-    @Value("${bull.strategy.timeSinceLastTrade.limit}")
+    @Value("${hourly.bull.strategy.timeSinceLastTrade.limit}")
     private int timeSinceLastTradeLimit;
 
     private List<BullStrategyCoin> bullStrategyCoins = new ArrayList<>();
 
-    private StringBuilder data = new StringBuilder("High Price Record Data (Bull Strategy):");
+    private StringBuilder data = new StringBuilder("High Price Record Data (Hourly Bull Strategy):");
 
     // Condition 2
     public PotentialWinningCoin checkIfCoinIsTradable(PotentialWinningCoin potentialWinningCoin) {
@@ -62,7 +62,8 @@ public class BullStrategy {
 
     // Condition 3
     // Check if previous hour is no more a gain than the lowest gain found
-    public PotentialWinningCoin checkIfCandleStick_1HFromPreviousDayIsALoss(PotentialWinningCoin potentialWinningCoin) {
+    public PotentialWinningCoin checkIfCandleStick_1HFromPreviousHourIsALoss(
+            PotentialWinningCoin potentialWinningCoin) {
 
         Double lowestEndOfHourGain = 0.0;
 
@@ -71,9 +72,9 @@ public class BullStrategy {
                     .get(potentialWinningCoin.getCandleSticks_1H().size() - 1) != candleStick_1H) {
                 if (candleStick_1H.getOpenPrice() <= candleStick_1H.getClosePrice()) {
                     if (lowestEndOfHourGain == 0.0) {
-                        lowestEndOfHourGain = candleStick_1H.getEndOfDayGain();
-                    } else if (candleStick_1H.getEndOfDayGain() < lowestEndOfHourGain) {
-                        lowestEndOfHourGain = candleStick_1H.getEndOfDayGain();
+                        lowestEndOfHourGain = candleStick_1H.getEndOfCandleStickGain();
+                    } else if (candleStick_1H.getEndOfCandleStickGain() < lowestEndOfHourGain) {
+                        lowestEndOfHourGain = candleStick_1H.getEndOfCandleStickGain();
                     }
                 }
             }
@@ -83,7 +84,7 @@ public class BullStrategy {
             if (potentialWinningCoin.getCandleSticks_1H()
                     .get(potentialWinningCoin.getCandleSticks_1H().size() - 2) == candleStick_1H) {
 
-                if (candleStick_1H.getEndOfDayGain() > lowestEndOfHourGain) {
+                if (candleStick_1H.getEndOfCandleStickGain() > lowestEndOfHourGain) {
                     potentialWinningCoin = null;
                     break;
                 }
@@ -123,7 +124,7 @@ public class BullStrategy {
                     / potentialWinningCoin.getHighPriceRecords().get(0).getHighPrice()) * 100;
         }
 
-        if (highPriceRecordGain < highRecordGainLimit || highPriceRecordGain < restrictedAmount(potentialWinningCoin)) {
+        if (highPriceRecordGain < highRecordGainLimit) {
             potentialWinningCoin = null;
         } else {
             recordHighPriceRecordGains(highPriceRecordGain, potentialWinningCoin);
@@ -135,17 +136,6 @@ public class BullStrategy {
         return potentialWinningCoin;
     }
 
-    private Double restrictedAmount(PotentialWinningCoin potentialWinningCoin) {
-
-        Double restrictedAmount = 0.0;
-
-        if (potentialWinningCoin.getSymbol().equals("LINKBTC")) {
-            restrictedAmount = 0.52;
-        }
-
-        return restrictedAmount;
-    }
-
     private void recordHighPriceRecordGains(Double highPriceRecordGain, PotentialWinningCoin potentialWinningCoin) {
 
         data.append(" [ (" + potentialWinningCoin.getSymbol() + ") - " + highPriceRecordGain + " ] ");
@@ -153,9 +143,9 @@ public class BullStrategy {
         LOGGER.info(data.toString());
     }
 
-    @Scheduled(cron = "31 0 0 * * *", zone = "UTC")
+    @Scheduled(cron = "25 0 0 * * *", zone = "UTC")
     private void resetBullData() {
 
-        data = new StringBuilder("High Price Record Data (Bull Strategy):");
+        data = new StringBuilder("High Price Record Data (Hourly Bull Strategy):");
     }
 }

@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-CryptoBotApplication<cryptoBot>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "console": "internalConsole",
+            "mainClass": "com.binance.cryptoBot.CryptoBotApplication",
+            "projectName": "cryptoBot",
+            "args": ""
+        }
+    ]
+}

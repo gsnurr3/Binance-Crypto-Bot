@@ -8,6 +8,7 @@ import com.binance.helper.RestTemplateHelper;
 import com.binance.model.Account;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class AccountDTO {
     private RestTemplateHelper restTemplateHelper;
 
     public Account getAccountInfo()
-            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 
         LOGGER.info("Retrieving account information...");
 

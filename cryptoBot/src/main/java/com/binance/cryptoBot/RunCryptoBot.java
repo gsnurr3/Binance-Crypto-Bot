@@ -1,6 +1,7 @@
 package com.binance.cryptoBot;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,6 +18,7 @@ import com.binance.service.ExchangeInfoService;
 import com.binance.service.KlinesService;
 import com.binance.service.PriceService;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 
 /**
  * ApplicationStartup
@@ -63,6 +66,8 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     private Boolean isTrading = false;
     private Double totalProfit = 0.0;
 
+    public static Boolean isMarketBull = false;
+
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
@@ -77,6 +82,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                 LOGGER.info("Binance Crypto Bot starting...");
 
                 coins = exchangeInfoService.getExchangeInfo(coins);
+
                 coins = klinesService.getAllCandleSticks_1H(coins);
                 coins = klinesService.getAllCandleSticks_24H(coins);
 
@@ -89,28 +95,41 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                 coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks(coins, isTrading);
 
                 PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin();
-                potentialWinningCoin = strategyHandler.evaluatePotentialWinningCoins();
+                potentialWinningCoin = strategyHandler.evaluatePotentialWinningCoins(isTrading);
 
                 if (potentialWinningCoin != null) {
 
                     WinningCoin winningCoin = new WinningCoin(potentialWinningCoin.getSymbol(),
                             potentialWinningCoin.getStatus(), potentialWinningCoin.getPrices(),
                             potentialWinningCoin.getCandleSticks_1H(), potentialWinningCoin.getCandleSticks_24H());
-                    winningCoin.setisBull(potentialWinningCoin.isBull());
-                    winningCoin.setisBear(potentialWinningCoin.isBear());
+                    winningCoin.setIsHourlyBull(potentialWinningCoin.isHourlyBull());
+                    winningCoin.setIsHourlyBear(potentialWinningCoin.isHourlyBear());
+                    winningCoin.setIsDailyBear(potentialWinningCoin.isDailyBear());
 
                     isTrading = true;
 
                     do {
-                        winningCoin = priceService.getPrice(winningCoin);
+                        coins = priceService.getAllPrices(coins);
+                        winningCoin = priceService.updateWinningCoinPrice(coins, winningCoin);
 
                         try {
                             winningCoin = tradeHandler.tradeCoin(winningCoin);
-                        } catch (IOException | NullPointerException e) {
-                            LOGGER.error(e.toString());
-                            emailHandler.sendEmail("Error", e.toString());
+                        } catch (ResourceAccessException | SocketTimeoutException | ConnectTimeoutException
+                                | NullPointerException e1) {
+                            LOGGER.error(e1.toString());
+                            emailHandler.sendEmail("Error", e1.toString());
+                            isTrading = false;
+                            this.onApplicationEvent(event);
+                        } catch (IOException e2) {
+                            LOGGER.error(e2.toString());
+                            emailHandler.sendEmail("Error", e2.toString());
+                            isTrading = false;
                             this.onApplicationEvent(event);
                         }
+
+                        coins = strategyHandler.checkForNewHighestPriceNewLowestPriceAndUpdateCandleSticks(coins,
+                                isTrading);
+                        strategyHandler.evaluatePotentialWinningCoins(isTrading);
 
                         try {
                             Thread.sleep(5000);
@@ -144,6 +163,16 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                 e.printStackTrace();
             }
         } while (totalProfit > maxLossAllowed);
+
+        if (!testMode) {
+            emailHandler.sendEmail("Max Loss Breached - Shutting Down Binance Crypto Bot",
+                    "Binance Crypto Bot has a max loss allowed of " + maxLossAllowed + ". The total loss has been "
+                            + totalProfit + ".");
+        } else {
+            emailHandler.sendEmail("Max Loss Breached - Shutting Down Binance Crypto Bot (Test Mode)",
+                    "Binance Crypto Bot has a max loss allowed of " + maxLossAllowed + ". The total loss has been "
+                            + totalProfit + ".");
+        }
     }
 
     // A cron-like expression, extending the usual UN*X definition to include
@@ -152,7 +181,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     // E.g. "0 * * * * MON-FRI" means once per minute on weekdays (at the top of the
     // minute - the 0th second).
     // Default 20 0 0 * * *
-    @Scheduled(cron = "20 0 * * * *", zone = "UTC")
+    @Scheduled(cron = "15 0 * * * *", zone = "UTC")
     private void updateCandleSticksForNewHour() {
 
         if (!isTrading) {
@@ -160,7 +189,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
         }
     }
 
-    @Scheduled(cron = "25 0 0 * * *", zone = "UTC")
+    @Scheduled(cron = "20 0 0 * * *", zone = "UTC")
     private void updateCandleSticksForNewDay() {
 
         if (!isTrading) {

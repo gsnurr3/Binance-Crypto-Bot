@@ -5,13 +5,13 @@ import java.net.SocketTimeoutException;
 import java.util.List;
 
 import com.binance.api.ExchangeInfoAPI;
-import com.binance.handler.EmailHandler;
 import com.binance.helper.RestTemplateHelper;
 import com.binance.model.Coin;
 import com.binance.model.ExchangeInfo;
 import com.binance.model.Symbols;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,40 +33,24 @@ public class ExchangeInfoDTO {
     @Autowired
     private RestTemplateHelper restTemplateHelper;
 
-    @Autowired
-    private EmailHandler emailhandler;
-
-    public List<Coin> getExchangeInfo(List<Coin> coins) {
+    public List<Coin> getExchangeInfo(List<Coin> coins)
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 
         LOGGER.info("Initializing coins for Binance BTC Market...");
 
         ResponseEntity<String> responseEntity = null;
 
-        try {
-            responseEntity = restTemplateHelper.getResponseEntityString(exchangeInfoAPI.getEXCHANGE_INFO_ENDPOINT());
-        } catch (ResourceAccessException | SocketTimeoutException e) {
-            try {
-                Thread.sleep(30000);
-            } catch (InterruptedException e1) {
-                LOGGER.error(e.getMessage(), e);
-            }
-            getExchangeInfo(coins);
-        }
+        responseEntity = restTemplateHelper.getResponseEntityString(exchangeInfoAPI.getEXCHANGE_INFO_ENDPOINT());
 
         ObjectMapper objectMapper = new ObjectMapper();
 
         ExchangeInfo exchangeInfo = null;
 
-        try {
-            exchangeInfo = objectMapper.readValue(responseEntity.getBody(), ExchangeInfo.class);
-        } catch (IOException e) {
-            LOGGER.error(e.getMessage(), e);
-        } catch (Exception e) {
-            emailhandler.sendEmail("Error", e.toString());
-        }
+        exchangeInfo = objectMapper.readValue(responseEntity.getBody(), ExchangeInfo.class);
 
         int index = 0;
 
+        coins.clear();
         if (coins.size() == 0) {
             for (Symbols symbol : exchangeInfo.getSymbols()) {
                 if (symbol.getSymbol().matches(".*BTC\\b") && !symbol.getSymbol().contains("US")

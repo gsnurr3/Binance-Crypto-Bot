@@ -1,16 +1,17 @@
 package com.binance.dto;
 
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.List;
 import java.util.Scanner;
 
 import com.binance.api.KlinesAPI;
-import com.binance.handler.EmailHandler;
 import com.binance.helper.RestTemplateHelper;
 import com.binance.model.CandleStick_1H;
 import com.binance.model.CandleStick_24H;
 import com.binance.model.Coin;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +46,8 @@ public class KlinesDTO {
     @Autowired
     private RestTemplateHelper restTemplateHelper;
 
-    @Autowired
-    private EmailHandler emailhandler;
-
-    public List<Coin> getAllCandleSticks_1H(List<Coin> coins) {
+    public List<Coin> getAllCandleSticks_1H(List<Coin> coins)
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 
         LOGGER.info("Getting 1 hour candlesticks for past " + hourLimit + " hours...");
 
@@ -61,33 +60,11 @@ public class KlinesDTO {
 
             ResponseEntity<String> responseEntity = null;
 
-            try {
-                responseEntity = restTemplateHelper
-                        .getResponseEntityString(klinesAPI.getKLINES_ENDPOINT() + queryString);
-            } catch (ResourceAccessException | SocketTimeoutException e) {
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e1) {
-                    LOGGER.error(e.getMessage(), e1);
-                } catch (Exception e2) {
-                    emailhandler.sendEmail("Error", e2.toString());
-                }
-                getAllCandleSticks_1H(coins);
-            } catch (Exception e3) {
-                emailhandler.sendEmail("Error", e3.toString());
-            }
+            responseEntity = restTemplateHelper.getResponseEntityString(klinesAPI.getKLINES_ENDPOINT() + queryString);
 
             String result = null;
-            try {
-                result = responseEntity.getBody();
-            } catch (NullPointerException e) {
-                LOGGER.error(e.getMessage(), e);
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e1) {
-                    LOGGER.error(e.getMessage(), e1);
-                }
-            }
+
+            result = responseEntity.getBody();
 
             // Code from here down needs to be refactored
             result = result.replace("[", "");
@@ -127,7 +104,8 @@ public class KlinesDTO {
         return coins;
     }
 
-    public List<Coin> getAllCandleSticks_24H(List<Coin> coins) {
+    public List<Coin> getAllCandleSticks_24H(List<Coin> coins)
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 
         LOGGER.info("Getting 24 hour candlesticks for past " + dayLimit + " days...");
 
@@ -139,33 +117,11 @@ public class KlinesDTO {
 
             ResponseEntity<String> responseEntity = null;
 
-            try {
-                responseEntity = restTemplateHelper
-                        .getResponseEntityString(klinesAPI.getKLINES_ENDPOINT() + queryString);
-            } catch (ResourceAccessException | SocketTimeoutException e) {
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e1) {
-                    LOGGER.error(e.getMessage(), e1);
-                } catch (Exception e2) {
-                    emailhandler.sendEmail("Error", e2.toString());
-                }
-                getAllCandleSticks_24H(coins);
-            } catch (Exception e3) {
-                emailhandler.sendEmail("Error", e3.toString());
-            }
+            responseEntity = restTemplateHelper.getResponseEntityString(klinesAPI.getKLINES_ENDPOINT() + queryString);
 
             String result = null;
-            try {
-                result = responseEntity.getBody();
-            } catch (NullPointerException e) {
-                LOGGER.error(e.getMessage(), e);
-                try {
-                    Thread.sleep(30000);
-                } catch (InterruptedException e1) {
-                    LOGGER.error(e.getMessage(), e1);
-                }
-            }
+
+            result = responseEntity.getBody();
 
             // Code from here down needs to be refactored
             result = result.replace("[", "");

@@ -17,13 +17,13 @@ import org.springframework.stereotype.Component;
  * BearStrategy
  */
 @Component
-public class BearStrategy {
+public class DailyBearStrategy {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BearStrategy.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DailyBearStrategy.class);
 
     private List<Double> endOfDayDifferences = new ArrayList<>();
 
-    @Value("${bear.strategy.lowestEndOfDayLossAccuracy}")
+    @Value("${daily.bear.strategy.lowestEndOfDayLossAccuracy}")
     private Double lowestEndOfDayLossAccuracy;
 
     // Condition 2
@@ -37,9 +37,9 @@ public class BearStrategy {
                     .get(potentialWinningCoin.getCandleSticks_24H().size() - 1) != candleStick_24H) {
                 if (candleStick_24H.getOpenPrice() <= candleStick_24H.getClosePrice()) {
                     if (lowestEndOfDayGain == 0.0) {
-                        lowestEndOfDayGain = candleStick_24H.getEndOfDayGain();
-                    } else if (candleStick_24H.getEndOfDayGain() < lowestEndOfDayGain) {
-                        lowestEndOfDayGain = candleStick_24H.getEndOfDayGain();
+                        lowestEndOfDayGain = candleStick_24H.getEndOfCandleStickGain();
+                    } else if (candleStick_24H.getEndOfCandleStickGain() < lowestEndOfDayGain) {
+                        lowestEndOfDayGain = candleStick_24H.getEndOfCandleStickGain();
                     }
                 }
             }
@@ -48,7 +48,7 @@ public class BearStrategy {
         for (CandleStick_24H candleStick_24H : potentialWinningCoin.getCandleSticks_24H()) {
             if (potentialWinningCoin.getCandleSticks_24H()
                     .get(potentialWinningCoin.getCandleSticks_24H().size() - 2) == candleStick_24H) {
-                if (candleStick_24H.getEndOfDayGain() > lowestEndOfDayGain) {
+                if (candleStick_24H.getEndOfCandleStickGain() > lowestEndOfDayGain) {
                     potentialWinningCoin = null;
                     break;
                 }
@@ -113,9 +113,9 @@ public class BearStrategy {
                     .get(potentialWinningCoin.getCandleSticks_24H().size() - 1) != candleStick_24H) {
                 if (candleStick_24H.getOpenPrice() > candleStick_24H.getClosePrice()) {
                     if (lowestEndOfDayLoss == 0.0) {
-                        lowestEndOfDayLoss = candleStick_24H.getEndOfDayLoss();
-                    } else if (candleStick_24H.getEndOfDayLoss() < lowestEndOfDayLoss) {
-                        lowestEndOfDayLoss = candleStick_24H.getEndOfDayLoss();
+                        lowestEndOfDayLoss = candleStick_24H.getEndOfCandleStickLoss();
+                    } else if (candleStick_24H.getEndOfCandleStickLoss() < lowestEndOfDayLoss) {
+                        lowestEndOfDayLoss = candleStick_24H.getEndOfCandleStickLoss();
                     }
                 }
             }
@@ -163,7 +163,7 @@ public class BearStrategy {
 
         StringBuilder data = new StringBuilder();
 
-        data.append("End of Day Difference Data (Bear Strategy):");
+        data.append("End of Day Difference Data (Daily Bear Strategy):");
 
         for (Double endOfDayDifference : endOfDayDifferences) {
             data.append(" [ " + endOfDayDifference + " ] ");

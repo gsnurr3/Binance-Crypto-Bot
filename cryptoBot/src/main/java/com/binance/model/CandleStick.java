@@ -20,8 +20,8 @@ public class CandleStick {
     private Double takerBuyBaseAssetVolume;
     private Double takerBuyQuoteAssetVolume;
     private Double ignore;
-    private Double endOfDayGain = 0.0;
-    private Double endOfDayLoss = 0.0;
+    private Double endOfCandleStickGain = 0.0;
+    private Double endOfCandleStickLoss = 0.0;
 
     public Long getOpenTime() {
         return openTime;
@@ -119,29 +119,29 @@ public class CandleStick {
         this.ignore = ignore;
     }
 
-    public Double getEndOfDayGain() {
-        return endOfDayGain;
+    public Double getEndOfCandleStickGain() {
+        return endOfCandleStickGain;
     }
 
-    public void setEndOfDayGain(Double endOfDayGain) {
-        this.endOfDayGain = endOfDayGain;
+    public void setEndOfCandleStickGain(Double endOfCandleStickGain) {
+        this.endOfCandleStickGain = endOfCandleStickGain;
     }
 
-    public Double getEndOfDayLoss() {
-        return endOfDayLoss;
+    public Double getEndOfCandleStickLoss() {
+        return endOfCandleStickLoss;
     }
 
-    public void setEndOfDayLoss(Double endOfDayLoss) {
-        this.endOfDayLoss = endOfDayLoss;
+    public void setEndOfCandleStickLoss(Double endOfCandleStickLoss) {
+        this.endOfCandleStickLoss = endOfCandleStickLoss;
     }
 
     @Override
     public String toString() {
-        return "CandleStick_24H [closePrice=" + closePrice + ", closeTime=" + closeTime + ", endOfDayGain="
-                + endOfDayGain + ", endOfDayLoss=" + endOfDayLoss + ", highPrice=" + highPrice + ", ignore=" + ignore
-                + ", lowPrice=" + lowPrice + ", numberOfTrades=" + numberOfTrades + ", openPrice=" + openPrice
-                + ", openTime=" + openTime + ", quoteAssetVolume=" + quoteAssetVolume + ", takerBuyBaseAssetVolume="
-                + takerBuyBaseAssetVolume + ", takerBuyQuoteAssetVolume=" + takerBuyQuoteAssetVolume + ", volume="
-                + volume + "]";
+        return "CandleStick [closePrice=" + closePrice + ", closeTime=" + closeTime + ", endOfCandleStickGain="
+                + endOfCandleStickGain + ", endOfCandleStickLoss=" + endOfCandleStickLoss + ", highPrice=" + highPrice
+                + ", ignore=" + ignore + ", lowPrice=" + lowPrice + ", numberOfTrades=" + numberOfTrades
+                + ", openPrice=" + openPrice + ", openTime=" + openTime + ", quoteAssetVolume=" + quoteAssetVolume
+                + ", takerBuyBaseAssetVolume=" + takerBuyBaseAssetVolume + ", takerBuyQuoteAssetVolume="
+                + takerBuyQuoteAssetVolume + ", volume=" + volume + "]";
     }
 }

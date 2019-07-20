@@ -14,6 +14,7 @@ import com.binance.model.WinningCoin;
 import com.binance.service.AccountService;
 import com.binance.service.OrderService;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,23 +36,23 @@ public class TradeHandler {
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private EmailHandler emailHandler;
-
     @Value("${trade.max.time}")
     private Double maxTradeTime;
 
     @Value("${trade.profitBeforeSelling}")
     private Double profitBeforeSelling;
 
-    @Value("${trade.isBull.lossBeforeSelling}")
-    private Double isBullLossBeforeSelling;
-
-    @Value("${trade.isBear.lossBeforeSelling}")
-    private Double isBearLossingBeforeSelling;
-
     @Value("${trade.marginFromCurrentAndHighestPrice}")
     private Double marginFromCurrentAndHighestPrice;
+
+    @Value("${trade.isHourlyBull.lossBeforeSelling}")
+    private Double hourlyBullLossBeforeSelling;
+
+    @Value("${trade.isHourlyBear.lossBeforeSelling}")
+    private Double hourlyBearLossBeforeSelling;
+
+    @Value("${trade.isDailyBear.lossBeforeSelling}")
+    private Double dailyBearLossBeforeSelling;
 
     @Value("${trade.test.mode}")
     private Boolean testMode;
@@ -75,10 +76,12 @@ public class TradeHandler {
 
         Double lossBeforeSelling = 0.0;
 
-        if (winningCoin.isBull()) {
-            lossBeforeSelling = isBullLossBeforeSelling;
-        } else if (winningCoin.isBear()) {
-            lossBeforeSelling = isBearLossingBeforeSelling;
+        if (winningCoin.isHourlyBull()) {
+            lossBeforeSelling = hourlyBullLossBeforeSelling;
+        } else if (winningCoin.isHourlyBear()) {
+            lossBeforeSelling = hourlyBearLossBeforeSelling;
+        } else if (winningCoin.isDailyBear()) {
+            lossBeforeSelling = dailyBearLossBeforeSelling;
         }
 
         if (!winningCoin.isBought()) {
@@ -88,20 +91,36 @@ public class TradeHandler {
         } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() < profitBeforeSelling
                 && winningCoin.getProfitSinceBuyPrice() > lossBeforeSelling) {
             holdCoin(winningCoin);
-        } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() >= profitBeforeSelling
-                || winningCoin.getProfitSinceBuyPrice() <= lossBeforeSelling) {
-            if (winningCoin.getProfitSinceBuyPrice() >= lossBeforeSelling && winningCoin
-                    .getMarginFromCurrentAndHighestPrice() >= (marginFromCurrentAndHighestPrice + diminishingMargin)) {
-                holdCoin(winningCoin);
-            } else {
-                sellCoin(winningCoin);
-            }
+        } else {
+            sellCoin(winningCoin);
         }
+
+        // if (!winningCoin.isBought()) {
+        // buyCoin(winningCoin);
+        // } else if (winningCoin.isBought() && maxTradeTimeCounter / 720 >=
+        // maxTradeTime) {
+        // sellCoin(winningCoin);
+        // } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() <
+        // profitBeforeSelling
+        // && winningCoin.getProfitSinceBuyPrice() > lossBeforeSelling) {
+        // holdCoin(winningCoin);
+        // } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() >=
+        // profitBeforeSelling
+        // || winningCoin.getProfitSinceBuyPrice() <= lossBeforeSelling) {
+        // if (winningCoin.getProfitSinceBuyPrice() >= lossBeforeSelling && winningCoin
+        // .getMarginFromCurrentAndHighestPrice() >= (marginFromCurrentAndHighestPrice +
+        // diminishingMargin)) {
+        // holdCoin(winningCoin);
+        // } else {
+        // sellCoin(winningCoin);
+        // }
+        // }
+
         return winningCoin;
     }
 
-    private void buyCoin(WinningCoin winningCoin)
-            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
+    private void buyCoin(WinningCoin winningCoin) throws ResourceAccessException, SocketTimeoutException, IOException,
+            NullPointerException, ConnectTimeoutException {
 
         diminishingMargin = 0.0;
         maxTradeTimeCounter = 0;
@@ -183,20 +202,7 @@ public class TradeHandler {
 
         if (!testMode) {
             order = new Order();
-
-            try {
-                order = orderService.postSellOrder(winningCoin, quantity);
-            } catch (IOException | NullPointerException e) {
-                LOGGER.error(e.toString());
-                emailHandler.sendEmail("Error", e.toString());
-
-                try {
-                    Thread.sleep(5000);
-                    sellCoin(winningCoin);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
+            order = orderService.postSellOrder(winningCoin, quantity);
 
             Double totalQuantity = 0.0;
             Double avgWeightedPrice = 0.0;
@@ -233,17 +239,14 @@ public class TradeHandler {
     private Double setDiminishingMargin(WinningCoin winningCoin) {
 
         if (winningCoin.isBought()) {
-            if (winningCoin.getProfitSinceBuyPrice() >= 1.00 && diminishingMargin < 0.50) {
-                diminishingMargin = 0.50;
+            if (winningCoin.getProfitSinceBuyPrice() >= 2.00 && diminishingMargin > -0.25) {
+                diminishingMargin = -0.25;
             }
-            if (winningCoin.getProfitSinceBuyPrice() >= 1.50 && diminishingMargin < 1.00) {
-                diminishingMargin = 1.00;
+            if (winningCoin.getProfitSinceBuyPrice() >= 3.00 && diminishingMargin > -0.50) {
+                diminishingMargin = -0.50;
             }
-            if (winningCoin.getProfitSinceBuyPrice() >= 2.00 && diminishingMargin < 1.50) {
-                diminishingMargin = 1.50;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 6.00) {
-                diminishingMargin = 0.0;
+            if (winningCoin.getProfitSinceBuyPrice() >= 4.00 && diminishingMargin > -0.75) {
+                diminishingMargin = -0.75;
             }
         }
 

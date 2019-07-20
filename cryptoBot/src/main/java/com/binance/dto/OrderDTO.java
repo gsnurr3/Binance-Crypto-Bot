@@ -9,6 +9,7 @@ import com.binance.model.Order;
 import com.binance.model.WinningCoin;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class OrderDTO {
     }
 
     public Order postBuyOrder(WinningCoin winningCoin, Double quantity)
-            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 
         LOGGER.info("Placing buy order for " + winningCoin.getSymbol() + "...");
 
@@ -81,7 +82,7 @@ public class OrderDTO {
     }
 
     public Order postSellOrder(WinningCoin winningCoin, Double quantity)
-            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 
         LOGGER.info("Placing sell order for " + winningCoin.getSymbol() + "...");
 

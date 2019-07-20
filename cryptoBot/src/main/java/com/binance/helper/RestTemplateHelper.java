@@ -1,10 +1,12 @@
 package com.binance.helper;
 
+import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import org.apache.http.conn.ConnectTimeoutException;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -22,7 +25,8 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class RestTemplateHelper {
 
-    public ResponseEntity<String> getResponseEntityString(String url) throws SocketTimeoutException {
+    public ResponseEntity<String> getResponseEntityString(String url) throws ResourceAccessException,
+            SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 
         URI uri = null;
 
@@ -38,7 +42,8 @@ public class RestTemplateHelper {
     }
 
     public ResponseEntity<String> getResponseEntitySHA256String(String url, String apiKey)
-            throws SocketTimeoutException {
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException,
+            ConnectTimeoutException {
 
         URI uri = null;
 
@@ -63,7 +68,8 @@ public class RestTemplateHelper {
     }
 
     public ResponseEntity<String> postResponseEntitySHA256String(String url, String apiKey)
-            throws SocketTimeoutException {
+            throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException,
+            ConnectTimeoutException {
 
         URI uri = null;
 
@@ -90,7 +96,8 @@ public class RestTemplateHelper {
         return response;
     }
 
-    private ClientHttpRequestFactory getClientHttpRequestFactory() {
+    private ClientHttpRequestFactory getClientHttpRequestFactory() throws ResourceAccessException,
+            SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
         int timeout = 5000;
         HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
         clientHttpRequestFactory.setConnectTimeout(timeout);
