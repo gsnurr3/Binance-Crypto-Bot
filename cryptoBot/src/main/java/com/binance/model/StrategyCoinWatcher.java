@@ -5,7 +5,7 @@ import com.google.common.base.Stopwatch;
 /**
  * BullStrategyCoin
  */
-public class BullStrategyCoin extends Coin {
+public class StrategyCoinWatcher extends Coin {
 
     private Stopwatch timeSinceLastTrade = Stopwatch.createStarted();
 

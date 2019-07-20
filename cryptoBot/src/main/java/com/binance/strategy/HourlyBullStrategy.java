@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.binance.model.BullStrategyCoin;
 import com.binance.model.CandleStick_1H;
 import com.binance.model.PotentialWinningCoin;
+import com.binance.model.StrategyCoinWatcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,21 +34,21 @@ public class HourlyBullStrategy {
     @Value("${hourly.bull.strategy.timeSinceLastTrade.limit}")
     private int timeSinceLastTradeLimit;
 
-    private List<BullStrategyCoin> bullStrategyCoins = new ArrayList<>();
+    private List<StrategyCoinWatcher> strategyCoinWatchers = new ArrayList<>();
 
     private StringBuilder data = new StringBuilder("High Price Record Data (Hourly Bull Strategy):");
 
     // Condition 2
     public PotentialWinningCoin checkIfCoinIsTradable(PotentialWinningCoin potentialWinningCoin) {
 
-        for (BullStrategyCoin bullStrategyCoin : bullStrategyCoins) {
-            if (bullStrategyCoin.getSymbol().equals(potentialWinningCoin.getSymbol())) {
+        for (StrategyCoinWatcher strategyCoinWatcher : strategyCoinWatchers) {
+            if (strategyCoinWatcher.getSymbol().equals(potentialWinningCoin.getSymbol())) {
                 long totalTimeInMinutes = 0L;
 
-                totalTimeInMinutes = bullStrategyCoin.getTimeSinceLastTrade().elapsed(TimeUnit.MINUTES);
+                totalTimeInMinutes = strategyCoinWatcher.getTimeSinceLastTrade().elapsed(TimeUnit.MINUTES);
 
                 if (totalTimeInMinutes >= timeSinceLastTradeLimit) {
-                    bullStrategyCoins.remove(bullStrategyCoin);
+                    strategyCoinWatchers.remove(strategyCoinWatcher);
                     break;
                 } else {
                     potentialWinningCoin = null;
@@ -128,9 +128,9 @@ public class HourlyBullStrategy {
             potentialWinningCoin = null;
         } else {
             recordHighPriceRecordGains(highPriceRecordGain, potentialWinningCoin);
-            BullStrategyCoin bullStrategyCoin = new BullStrategyCoin();
-            bullStrategyCoin.setSymbol(potentialWinningCoin.getSymbol());
-            bullStrategyCoins.add(bullStrategyCoin);
+            StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
+            strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
+            strategyCoinWatchers.add(strategyCoinWatcher);
         }
 
         return potentialWinningCoin;

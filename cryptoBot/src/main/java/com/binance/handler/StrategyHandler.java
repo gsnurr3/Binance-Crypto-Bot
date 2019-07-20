@@ -208,7 +208,7 @@ public class StrategyHandler {
                 if (potentialCoin.isHourlyBear()) {
 
                     // Condition 2
-                    potentialWinningCoin = hourlyBearStrategy.checkCandleStick_1HFromPreviousHour(potentialCoin);
+                    potentialWinningCoin = hourlyBearStrategy.checkIfCoinIsTradable(potentialCoin);
 
                     if (potentialWinningCoin == null) {
                         message = "Condition 2 failed. Potential winning coin will be removed from further evaluation: "
@@ -217,7 +217,7 @@ public class StrategyHandler {
                     }
 
                     // Condition 3
-                    potentialWinningCoin = hourlyBearStrategy.checkIfCoinMarketIsTooBear(potentialCoin);
+                    potentialWinningCoin = hourlyBearStrategy.checkCandleStick_1HFromPreviousHour(potentialCoin);
 
                     if (potentialWinningCoin == null) {
                         message = "Condition 3 failed. Potential winning coin will be removed from further evaluation: "
@@ -226,10 +226,19 @@ public class StrategyHandler {
                     }
 
                     // Condition 4
+                    potentialWinningCoin = hourlyBearStrategy.checkIfCoinMarketIsTooBear(potentialCoin);
+
+                    if (potentialWinningCoin == null) {
+                        message = "Condition 4 failed. Potential winning coin will be removed from further evaluation: "
+                                + potentialCoin.getSymbol();
+                        continue;
+                    }
+
+                    // Condition 5
                     potentialWinningCoin = hourlyBearStrategy.checkIfCandleStick_1HIsANewLowRecord(potentialCoin);
 
                     if (potentialWinningCoin != null) {
-                        message = "Condition 4 passed. All conditions passed. Buying "
+                        message = "Condition 5 passed. All conditions passed. Buying "
                                 + potentialWinningCoin.getSymbol() + " !!!";
                         break;
                     } else {
