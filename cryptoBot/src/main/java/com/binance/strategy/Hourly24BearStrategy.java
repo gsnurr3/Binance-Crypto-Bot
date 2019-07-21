@@ -168,7 +168,7 @@ public class Hourly24BearStrategy {
                         break;
                     } else {
                         Double currentChange = record - dynamicEndOfHourLossRecord;
-                        // if (currentChange > maxChangeAllowed) {
+                        // if (currentChange > (maxChangeAllowed - diminishingEndOfHourDifference)) {
                         emailHandler.sendEmail("Stat Report: " + potentialWinningCoin.getSymbol(),
                                 "(HourlyBearStrategy) Current change was " + currentChange
                                         + " vs max change allowed of " + maxChangeAllowed + ".");
