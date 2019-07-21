@@ -23,9 +23,7 @@ public class WinningCoin extends Coin {
     private Double profitSinceBuyPrice;
     private Boolean isBought = false;
     private Boolean isSold = false;
-    private Boolean isHourlyBull = false;
-    private Boolean isHourlyBear = false;
-    private Boolean isDailyBear = false;
+    private Boolean isHourly24Bear = false;
 
     public WinningCoin() {
 
@@ -124,36 +122,20 @@ public class WinningCoin extends Coin {
         this.isSold = isSold;
     }
 
-    public Boolean isHourlyBull() {
-        return isHourlyBull;
+    public Boolean isHourly24Bear() {
+        return isHourly24Bear;
     }
 
-    public void setIsHourlyBull(Boolean isHourlyBull) {
-        this.isHourlyBull = isHourlyBull;
-    }
-
-    public Boolean isHourlyBear() {
-        return isHourlyBear;
-    }
-
-    public void setIsHourlyBear(Boolean isHourlyBear) {
-        this.isHourlyBear = isHourlyBear;
-    }
-
-    public Boolean isDailyBear() {
-        return isDailyBear;
-    }
-
-    public void setIsDailyBear(Boolean isDailyBear) {
-        this.isDailyBear = isDailyBear;
+    public void setIsHourly24Bear(Boolean isHourly24Bear) {
+        this.isHourly24Bear = isHourly24Bear;
     }
 
     @Override
     public String toString() {
         return "WinningCoin [buyPrice=" + buyPrice + ", currentPrice=" + currentPrice + ", highestPrice=" + highestPrice
-                + ", isBought=" + isBought + ", isDailyBear=" + isDailyBear + ", isHourlyBear=" + isHourlyBear
-                + ", isHourlyBull=" + isHourlyBull + ", isSold=" + isSold + ", marginFromCurrentAndHighestPrice="
-                + marginFromCurrentAndHighestPrice + ", profit=" + profit + ", profitSinceBuyPrice="
-                + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", usdtPrice=" + usdtPrice + "]";
+                + ", isBought=" + isBought + ", isHourly24Bear=" + isHourly24Bear + ", isSold=" + isSold
+                + ", marginFromCurrentAndHighestPrice=" + marginFromCurrentAndHighestPrice + ", profit=" + profit
+                + ", profitSinceBuyPrice=" + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", usdtPrice="
+                + usdtPrice + "]";
     }
 }

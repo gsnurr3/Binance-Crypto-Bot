@@ -42,17 +42,8 @@ public class TradeHandler {
     @Value("${trade.profitBeforeSelling}")
     private Double profitBeforeSelling;
 
-    @Value("${trade.marginFromCurrentAndHighestPrice}")
-    private Double marginFromCurrentAndHighestPrice;
-
-    @Value("${trade.isHourlyBull.lossBeforeSelling}")
-    private Double hourlyBullLossBeforeSelling;
-
-    @Value("${trade.isHourlyBear.lossBeforeSelling}")
-    private Double hourlyBearLossBeforeSelling;
-
-    @Value("${trade.isDailyBear.lossBeforeSelling}")
-    private Double dailyBearLossBeforeSelling;
+    @Value("${trade.isHourly24Bear.lossBeforeSelling}")
+    private Double hourly24BearLossBeforeSelling;
 
     @Value("${trade.test.mode}")
     private Boolean testMode;
@@ -67,21 +58,13 @@ public class TradeHandler {
 
     private int holdCoinCount;
 
-    private Double diminishingMargin;
-
     public WinningCoin tradeCoin(WinningCoin winningCoin)
             throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
 
-        diminishingMargin = setDiminishingMargin(winningCoin);
-
         Double lossBeforeSelling = 0.0;
 
-        if (winningCoin.isHourlyBull()) {
-            lossBeforeSelling = hourlyBullLossBeforeSelling;
-        } else if (winningCoin.isHourlyBear()) {
-            lossBeforeSelling = hourlyBearLossBeforeSelling;
-        } else if (winningCoin.isDailyBear()) {
-            lossBeforeSelling = dailyBearLossBeforeSelling;
+        if (winningCoin.isHourly24Bear()) {
+            lossBeforeSelling = hourly24BearLossBeforeSelling;
         }
 
         if (!winningCoin.isBought()) {
@@ -95,34 +78,12 @@ public class TradeHandler {
             sellCoin(winningCoin);
         }
 
-        // if (!winningCoin.isBought()) {
-        // buyCoin(winningCoin);
-        // } else if (winningCoin.isBought() && maxTradeTimeCounter / 720 >=
-        // maxTradeTime) {
-        // sellCoin(winningCoin);
-        // } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() <
-        // profitBeforeSelling
-        // && winningCoin.getProfitSinceBuyPrice() > lossBeforeSelling) {
-        // holdCoin(winningCoin);
-        // } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() >=
-        // profitBeforeSelling
-        // || winningCoin.getProfitSinceBuyPrice() <= lossBeforeSelling) {
-        // if (winningCoin.getProfitSinceBuyPrice() >= lossBeforeSelling && winningCoin
-        // .getMarginFromCurrentAndHighestPrice() >= (marginFromCurrentAndHighestPrice +
-        // diminishingMargin)) {
-        // holdCoin(winningCoin);
-        // } else {
-        // sellCoin(winningCoin);
-        // }
-        // }
-
         return winningCoin;
     }
 
     private void buyCoin(WinningCoin winningCoin) throws ResourceAccessException, SocketTimeoutException, IOException,
             NullPointerException, ConnectTimeoutException {
 
-        diminishingMargin = 0.0;
         maxTradeTimeCounter = 0;
         holdCoinCount = 0;
 
@@ -234,22 +195,5 @@ public class TradeHandler {
         LOGGER.info("UTC Time is: " + dateFormat.format(date));
         LOGGER.info("******************* SELLING COIN ********************");
         LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
-    }
-
-    private Double setDiminishingMargin(WinningCoin winningCoin) {
-
-        if (winningCoin.isBought()) {
-            if (winningCoin.getProfitSinceBuyPrice() >= 2.00 && diminishingMargin > -0.25) {
-                diminishingMargin = -0.25;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 3.00 && diminishingMargin > -0.50) {
-                diminishingMargin = -0.50;
-            }
-            if (winningCoin.getProfitSinceBuyPrice() >= 4.00 && diminishingMargin > -0.75) {
-                diminishingMargin = -0.75;
-            }
-        }
-
-        return diminishingMargin;
     }
 }

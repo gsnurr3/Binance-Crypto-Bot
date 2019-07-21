@@ -39,16 +39,6 @@ public class OrderDTO {
         MARKET, LIMIT;
     }
 
-    // GTC (Good-Til-Canceled) orders are effective until they are executed or
-    // canceled.
-    // IOC (Immediate or Cancel) orders fills all or part of an order immediately
-    // and cancels the remaining part of the order.
-    // FOK (Fill or Kill) orders fills all in its entirety, otherwise, the entire
-    // order will be cancelled.
-    enum timeInForce {
-        GTC, IOC, FOK;
-    }
-
     public Order postBuyOrder(WinningCoin winningCoin, Double quantity)
             throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException, ConnectTimeoutException {
 

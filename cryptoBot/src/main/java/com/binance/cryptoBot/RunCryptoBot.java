@@ -66,8 +66,6 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     private Boolean isTrading = false;
     private Double totalProfit = 0.0;
 
-    public static Boolean isMarketBull = false;
-
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
@@ -102,9 +100,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                     WinningCoin winningCoin = new WinningCoin(potentialWinningCoin.getSymbol(),
                             potentialWinningCoin.getStatus(), potentialWinningCoin.getPrices(),
                             potentialWinningCoin.getCandleSticks_1H(), potentialWinningCoin.getCandleSticks_24H());
-                    winningCoin.setIsHourlyBull(potentialWinningCoin.isHourlyBull());
-                    winningCoin.setIsHourlyBear(potentialWinningCoin.isHourlyBear());
-                    winningCoin.setIsDailyBear(potentialWinningCoin.isDailyBear());
+                    winningCoin.setIsHourly24Bear(potentialWinningCoin.isHourly24Bear());
 
                     isTrading = true;
 
@@ -152,7 +148,6 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                     }
 
                     coins = klinesService.getAllCandleSticks_1H(coins);
-                    coins = klinesService.getAllCandleSticks_24H(coins);
 
                     isTrading = false;
                 }

@@ -17,7 +17,6 @@ public class Coin {
     private List<Double> prices = new ArrayList<>();
     private List<CandleStick_1H> candleSticks_1H = new ArrayList<>();
     private List<CandleStick_24H> candleSticks_24H = new ArrayList<>();
-    private List<HighPriceRecord> highPriceRecords = new ArrayList<>();
 
     public Coin() {
 
@@ -82,23 +81,9 @@ public class Coin {
         this.candleSticks_24H.add(candleStick_24H);
     }
 
-    public void setHighPriceRecords(List<HighPriceRecord> highPriceRecords) {
-        this.highPriceRecords = highPriceRecords;
-    }
-
-    public List<HighPriceRecord> getHighPriceRecords() {
-        return highPriceRecords;
-    }
-
-    public void addHighPriceRecord(HighPriceRecord highPriceRecord) {
-
-        this.highPriceRecords.add(highPriceRecord);
-    }
-
     @Override
     public String toString() {
-        return "Coin [candleSticks_1H=" + candleSticks_1H + ", candleSticks_24H=" + candleSticks_24H
-                + ", highPriceRecords=" + highPriceRecords + ", prices=" + prices + ", status=" + status + ", symbol="
-                + symbol + "]";
+        return "Coin [candleSticks_1H=" + candleSticks_1H + ", candleSticks_24H=" + candleSticks_24H + ", prices="
+                + prices + ", status=" + status + ", symbol=" + symbol + "]";
     }
 }
