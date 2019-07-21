@@ -66,6 +66,9 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     private Boolean isTrading = false;
     private Double totalProfit = 0.0;
 
+    public static Boolean didTradePreviousHour = false;
+    public static int diminishingEndOfHourDifference = 5;
+
     @Override
     public void onApplicationEvent(final ApplicationReadyEvent event) {
 
@@ -179,7 +182,16 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     @Scheduled(cron = "15 0 * * * *", zone = "UTC")
     private void updateCandleSticksForNewHour() {
 
+        if (didTradePreviousHour == false) {
+            if (diminishingEndOfHourDifference > 0) {
+                diminishingEndOfHourDifference--;
+            }
+        } else {
+            didTradePreviousHour = false;
+        }
+
         if (!isTrading) {
+            
             coins = klinesService.getAllCandleSticks_1H(coins);
         }
     }

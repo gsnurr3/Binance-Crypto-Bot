@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.binance.cryptoBot.RunCryptoBot;
 import com.binance.handler.EmailHandler;
 import com.binance.model.CandleStick_1H;
 import com.binance.model.PotentialWinningCoin;
@@ -177,6 +178,8 @@ public class Hourly24BearStrategy {
                         // potentialWinningCoin = null;
                         // break;
                         // } else {
+                        RunCryptoBot.didTradePreviousHour = true;
+                        RunCryptoBot.diminishingEndOfHourDifference = 5;
                         StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                         strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                         strategyCoinWatchers.add(strategyCoinWatcher);
@@ -185,7 +188,8 @@ public class Hourly24BearStrategy {
 
                     if (dynamicEndOfHourLossRecord != 0.0
                             && endOfHourDifferences.get(endOfHourDifferences.size() - 1) > dynamicEndOfHourLossRecord) {
-                        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1) + 5;
+                        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1)
+                                + RunCryptoBot.diminishingEndOfHourDifference;
                     }
                 }
             }
@@ -226,7 +230,8 @@ public class Hourly24BearStrategy {
     @Scheduled(cron = "10 0 * * * *", zone = "UTC")
     private void resetHourlyBearData() {
 
-        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1) + 5;
+        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1)
+                + RunCryptoBot.diminishingEndOfHourDifference;
 
         endOfHourDifferences.clear();
     }
