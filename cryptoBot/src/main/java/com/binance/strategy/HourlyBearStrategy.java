@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.binance.cryptoBot.RunCryptoBot;
 import com.binance.handler.EmailHandler;
 import com.binance.model.CandleStick_1H;
 import com.binance.model.PotentialWinningCoin;
@@ -169,36 +168,37 @@ public class HourlyBearStrategy {
                                 + dynamicEndOfHourLossRecord);
                     }
 
-                    if (dynamicEndOfHourLossRecord != 0.0) {
+                    if (dynamicEndOfHourLossRecord == 0.0) {
+                        potentialWinningCoin = null;
+                        break;
+                    } else if (record < dynamicEndOfHourLossRecord) {
+                        potentialWinningCoin = null;
+                        break;
+                    } else {
                         Double currentChange = record - dynamicEndOfHourLossRecord;
-                        if (currentChange > maxChangeAllowed) {
-                            emailHandler.sendEmail("Stat Report", "(HourlyBearStrategy) Current change was "
+                        // if (currentChange > maxChangeAllowed) {
+                            emailHandler.sendEmail("Stat Report: " + potentialWinningCoin.getSymbol(), "(HourlyBearStrategy) Current change was "
                                     + currentChange + " vs max change allowed of " + maxChangeAllowed + ".");
 
-                            LOGGER.info("Coin is too volatile. Not buying. Current change: " + currentChange
-                                    + ", Max Change Allowed: " + maxChangeAllowed + ".");
-                            potentialWinningCoin = null;
-                            break;
-                        }
+                            // LOGGER.info("Coin is too volatile. Not buying. Current change: " + currentChange
+                            //         + ", Max Change Allowed: " + maxChangeAllowed + ".");
+                            // potentialWinningCoin = null;
+                            // break;
+                        // } else {
+                            StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
+                            strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
+                            strategyCoinWatchers.add(strategyCoinWatcher);
+                        // }
                     }
 
-                    if (dynamicEndOfHourLossRecord != 0.0 && (record < dynamicEndOfHourLossRecord)) {
-                        potentialWinningCoin = null;
-                        break;
-                    } else {
-                        StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
-                        strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
-                        strategyCoinWatchers.add(strategyCoinWatcher);
-                    }
-
-                    if (dynamicEndOfHourLossRecord == 0.0 && hourLoss > lowestEndOfHourLoss) {
-                        potentialWinningCoin = null;
-                        break;
-                    } else {
-                        StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
-                        strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
-                        strategyCoinWatchers.add(strategyCoinWatcher);
-                    }
+                    // if (dynamicEndOfHourLossRecord == 0.0 && hourLoss > lowestEndOfHourLoss) {
+                    //     potentialWinningCoin = null;
+                    //     break;
+                    // } else {
+                    //     StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
+                    //     strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
+                    //     strategyCoinWatchers.add(strategyCoinWatcher);
+                    // }
 
                     if (dynamicEndOfHourLossRecord != 0.0
                             && endOfHourDifferences.get(endOfHourDifferences.size() - 1) > dynamicEndOfHourLossRecord) {
@@ -219,10 +219,10 @@ public class HourlyBearStrategy {
 
         endOfHourDifferences.add(record);
 
-        if (record > marketBullValue) {
-            RunCryptoBot.isMarketBull = false;
-            LOGGER.info("Market found to be bear. Disabling bull strategy!");
-        }
+        // if (record > marketBullValue) {
+        //     RunCryptoBot.isMarketBull = false;
+        //     LOGGER.info("Market found to be bear. Disabling bull strategy!");
+        // }
 
         Collections.sort(endOfHourDifferences);
 
@@ -248,19 +248,19 @@ public class HourlyBearStrategy {
     @Scheduled(cron = "10 0 * * * *", zone = "UTC")
     private void resetHourlyBearData() {
 
-        RunCryptoBot.isMarketBull = true;
+        // RunCryptoBot.isMarketBull = true;
 
-        for (Double endOfHourDifference : endOfHourDifferences) {
-            if (endOfHourDifference > marketBullValue) {
-                RunCryptoBot.isMarketBull = false;
-            }
-        }
+        // for (Double endOfHourDifference : endOfHourDifferences) {
+        //     if (endOfHourDifference > marketBullValue) {
+        //         RunCryptoBot.isMarketBull = false;
+        //     }
+        // }
 
-        if (RunCryptoBot.isMarketBull) {
-            LOGGER.info("Market found to be bull (" + RunCryptoBot.isMarketBull + "). Enabling bull strategy!");
-        } else {
-            LOGGER.info("Market found to be bear (" + RunCryptoBot.isMarketBull + "). Disabling bull strategy!");
-        }
+        // if (RunCryptoBot.isMarketBull) {
+        //     LOGGER.info("Market found to be bull (" + RunCryptoBot.isMarketBull + "). Enabling bull strategy!");
+        // } else {
+        //     LOGGER.info("Market found to be bear (" + RunCryptoBot.isMarketBull + "). Disabling bull strategy!");
+        // }
 
         dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1) + 5;
 

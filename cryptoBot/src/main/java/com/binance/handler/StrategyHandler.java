@@ -3,13 +3,10 @@ package com.binance.handler;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.binance.cryptoBot.RunCryptoBot;
 import com.binance.model.Coin;
-import com.binance.model.HighPriceRecord;
 import com.binance.model.PotentialWinningCoin;
 import com.binance.strategy.DailyBearStrategy;
 import com.binance.strategy.HourlyBearStrategy;
-import com.binance.strategy.HourlyBullStrategy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +38,6 @@ public class StrategyHandler {
     private int highPriceRecordLimit;
 
     @Autowired
-    private HourlyBullStrategy hourlyBullStrategy;
-
-    @Autowired
     private HourlyBearStrategy hourlyBearStrategy;
 
     @Autowired
@@ -56,46 +50,46 @@ public class StrategyHandler {
 
         for (Coin coin : coins) {
 
-            if (coin.getPrices().get(coin.getPrices().size() - 1) >= minBullPriceAllowed && !isBanned(coin)) {
+            // if (coin.getPrices().get(coin.getPrices().size() - 1) >= minBullPriceAllowed && !isBanned(coin)) {
 
-                if (coin.getPrices().get(coin.getPrices().size() - 1) > coin.getCandleSticks_24H()
-                        .get(coin.getCandleSticks_24H().size() - 1).getHighPrice()) {
+            //     if (coin.getPrices().get(coin.getPrices().size() - 1) > coin.getCandleSticks_24H()
+            //             .get(coin.getCandleSticks_24H().size() - 1).getHighPrice()) {
 
-                    coin.getCandleSticks_24H().get(coin.getCandleSticks_24H().size() - 1)
-                            .setHighPrice(coin.getPrices().get(coin.getPrices().size() - 1));
-                }
+            //         coin.getCandleSticks_24H().get(coin.getCandleSticks_24H().size() - 1)
+            //                 .setHighPrice(coin.getPrices().get(coin.getPrices().size() - 1));
+            //     }
 
-                if (coin.getPrices().get(coin.getPrices().size() - 1) > coin.getCandleSticks_1H()
-                        .get(coin.getCandleSticks_1H().size() - 1).getHighPrice()) {
+            //     if (coin.getPrices().get(coin.getPrices().size() - 1) > coin.getCandleSticks_1H()
+            //             .get(coin.getCandleSticks_1H().size() - 1).getHighPrice()) {
 
-                    if (!isTrading) {
-                        LOGGER.info("Updating hourly highest price to "
-                                + coin.getPrices().get(coin.getPrices().size() - 1) + " for " + coin.getSymbol());
-                    }
+            //         if (!isTrading) {
+            //             LOGGER.info("Updating hourly highest price to "
+            //                     + coin.getPrices().get(coin.getPrices().size() - 1) + " for " + coin.getSymbol());
+            //         }
 
-                    coin.getCandleSticks_1H().get(coin.getCandleSticks_1H().size() - 1)
-                            .setHighPrice(coin.getPrices().get(coin.getPrices().size() - 1));
+            //         coin.getCandleSticks_1H().get(coin.getCandleSticks_1H().size() - 1)
+            //                 .setHighPrice(coin.getPrices().get(coin.getPrices().size() - 1));
 
-                    if (coin.getHighPriceRecords().size() < highPriceRecordLimit
-                            || coin.getHighPriceRecords().size() == 0) {
-                        coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
-                    } else {
-                        coin.getHighPriceRecords().remove(0);
-                        coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
-                    }
+            //         if (coin.getHighPriceRecords().size() < highPriceRecordLimit
+            //                 || coin.getHighPriceRecords().size() == 0) {
+            //             coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
+            //         } else {
+            //             coin.getHighPriceRecords().remove(0);
+            //             coin.addHighPriceRecord(new HighPriceRecord(coin.getPrices().get(coin.getPrices().size() - 1)));
+            //         }
 
-                    if (RunCryptoBot.isMarketBull) {
+            //         if (RunCryptoBot.isMarketBull) {
 
-                        PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
-                                coin.getStatus(), coin.getPrices(), coin.getCandleSticks_1H(),
-                                coin.getCandleSticks_24H());
-                        potentialWinningCoin.setIsHourlyBull(true);
-                        potentialWinningCoin.setHighPriceRecords(coin.getHighPriceRecords());
+            //             PotentialWinningCoin potentialWinningCoin = new PotentialWinningCoin(coin.getSymbol(),
+            //                     coin.getStatus(), coin.getPrices(), coin.getCandleSticks_1H(),
+            //                     coin.getCandleSticks_24H());
+            //             potentialWinningCoin.setIsHourlyBull(true);
+            //             potentialWinningCoin.setHighPriceRecords(coin.getHighPriceRecords());
 
-                        potentialWinningCoins.add(potentialWinningCoin);
-                    }
-                }
-            }
+            //             potentialWinningCoins.add(potentialWinningCoin);
+            //         }
+            //     }
+            // }
 
             if (coin.getPrices().get(coin.getPrices().size() - 1) >= minBearPriceAllowed && !isBanned(coin)) {
 
@@ -163,47 +157,47 @@ public class StrategyHandler {
                     LOGGER.info(message);
                 }
 
-                if (potentialCoin.isHourlyBull()) {
+                // if (potentialCoin.isHourlyBull()) {
 
-                    // Condition 2
-                    potentialWinningCoin = hourlyBullStrategy.checkIfCoinIsTradable(potentialCoin);
+                //     // Condition 2
+                //     potentialWinningCoin = hourlyBullStrategy.checkIfCoinIsTradable(potentialCoin);
 
-                    if (potentialWinningCoin == null) {
-                        message = "Condition 2 failed. Potential winning coin will be removed from further evaluation: "
-                                + potentialCoin.getSymbol();
-                        continue;
-                    }
+                //     if (potentialWinningCoin == null) {
+                //         message = "Condition 2 failed. Potential winning coin will be removed from further evaluation: "
+                //                 + potentialCoin.getSymbol();
+                //         continue;
+                //     }
 
-                    // Condition 3
-                    potentialWinningCoin = hourlyBullStrategy
-                            .checkIfCandleStick_1HFromPreviousHourIsALoss(potentialCoin);
+                //     // Condition 3
+                //     potentialWinningCoin = hourlyBullStrategy
+                //             .checkIfCandleStick_1HFromPreviousHourIsALoss(potentialCoin);
 
-                    if (potentialWinningCoin == null) {
-                        message = "Condition 3 failed. Potential winning coin will be removed from further evaluation: "
-                                + potentialCoin.getSymbol();
-                        continue;
-                    }
+                //     if (potentialWinningCoin == null) {
+                //         message = "Condition 3 failed. Potential winning coin will be removed from further evaluation: "
+                //                 + potentialCoin.getSymbol();
+                //         continue;
+                //     }
 
-                    // Condition 4
-                    potentialWinningCoin = hourlyBullStrategy.checkHighPriceRecordTimeLimit(potentialCoin);
+                //     // Condition 4
+                //     potentialWinningCoin = hourlyBullStrategy.checkHighPriceRecordTimeLimit(potentialCoin);
 
-                    if (potentialWinningCoin == null) {
-                        message = "Condition 4 failed. Potential winning coin will be removed from further evaluation: "
-                                + potentialCoin.getSymbol();
-                        continue;
-                    }
+                //     if (potentialWinningCoin == null) {
+                //         message = "Condition 4 failed. Potential winning coin will be removed from further evaluation: "
+                //                 + potentialCoin.getSymbol();
+                //         continue;
+                //     }
 
-                    // Condition 5
-                    potentialWinningCoin = hourlyBullStrategy.checkHighPriceRecordsForSignificantGain(potentialCoin);
+                //     // Condition 5
+                //     potentialWinningCoin = hourlyBullStrategy.checkHighPriceRecordsForSignificantGain(potentialCoin);
 
-                    if (potentialWinningCoin != null) {
-                        potentialWinningCoin.setMessage("Condition 5 passed. All conditions passed. Buying "
-                                + potentialWinningCoin.getSymbol() + " !!!");
-                        break;
-                    } else {
-                        continue;
-                    }
-                }
+                //     if (potentialWinningCoin != null) {
+                //         potentialWinningCoin.setMessage("Condition 5 passed. All conditions passed. Buying "
+                //                 + potentialWinningCoin.getSymbol() + " !!!");
+                //         break;
+                //     } else {
+                //         continue;
+                //     }
+                // }
 
                 if (potentialCoin.isHourlyBear()) {
 
