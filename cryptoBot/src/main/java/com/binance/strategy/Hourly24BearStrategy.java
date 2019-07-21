@@ -171,7 +171,8 @@ public class Hourly24BearStrategy {
                         // if (currentChange > (maxChangeAllowed - diminishingEndOfHourDifference)) {
                         emailHandler.sendEmail("Stat Report: " + potentialWinningCoin.getSymbol(),
                                 "(HourlyBearStrategy) Current change was " + currentChange
-                                        + " vs max change allowed of " + maxChangeAllowed + ".");
+                                        + " vs max change allowed of "
+                                        + (maxChangeAllowed - diminishingEndOfHourDifference) + ".");
 
                         // LOGGER.info("Coin is too volatile. Not buying. Current change: " +
                         // currentChange
