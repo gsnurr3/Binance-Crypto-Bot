@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.binance.cryptoBot.RunCryptoBot;
 import com.binance.handler.EmailHandler;
 import com.binance.model.CandleStick_1H;
 import com.binance.model.PotentialWinningCoin;
@@ -38,6 +37,8 @@ public class Hourly24BearStrategy {
     private List<StrategyCoinWatcher> strategyCoinWatchers = new ArrayList<>();
     private List<Double> endOfHourDifferences = new ArrayList<>();
     private Double dynamicEndOfHourLossRecord = 0.0;
+    private Boolean didTradePreviousHour = false;
+    private int diminishingEndOfHourDifference = 5;
 
     // Condition 2
     public PotentialWinningCoin checkIfCoinIsTradable(PotentialWinningCoin potentialWinningCoin) {
@@ -178,8 +179,8 @@ public class Hourly24BearStrategy {
                         // potentialWinningCoin = null;
                         // break;
                         // } else {
-                        RunCryptoBot.didTradePreviousHour = true;
-                        RunCryptoBot.diminishingEndOfHourDifference = 5;
+                        didTradePreviousHour = true;
+                        diminishingEndOfHourDifference = 5;
                         StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                         strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                         strategyCoinWatchers.add(strategyCoinWatcher);
@@ -189,7 +190,7 @@ public class Hourly24BearStrategy {
                     if (dynamicEndOfHourLossRecord != 0.0
                             && endOfHourDifferences.get(endOfHourDifferences.size() - 1) > dynamicEndOfHourLossRecord) {
                         dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1)
-                                + RunCryptoBot.diminishingEndOfHourDifference;
+                                + diminishingEndOfHourDifference;
                     }
                 }
             }
@@ -230,8 +231,16 @@ public class Hourly24BearStrategy {
     @Scheduled(cron = "10 0 * * * *", zone = "UTC")
     private void resetHourlyBearData() {
 
+        if (didTradePreviousHour == false && dynamicEndOfHourLossRecord != 0.0) {
+            if (diminishingEndOfHourDifference > 0) {
+                diminishingEndOfHourDifference--;
+            }
+        } else {
+            didTradePreviousHour = false;
+        }
+
         dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1)
-                + RunCryptoBot.diminishingEndOfHourDifference;
+                + diminishingEndOfHourDifference;
 
         endOfHourDifferences.clear();
     }
