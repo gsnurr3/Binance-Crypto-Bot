@@ -167,25 +167,19 @@ public class Hourly24BearStrategy {
                         potentialWinningCoin = null;
                         break;
                     } else {
-                        Double currentChange = record - dynamicEndOfHourLossRecord;
-                        // if (currentChange > (maxChangeAllowed - diminishingEndOfHourDifference)) {
-                        emailHandler.sendEmail("Stat Report: " + potentialWinningCoin.getSymbol(),
-                                "(HourlyBearStrategy) Current change was " + currentChange
-                                        + " vs max change allowed of "
-                                        + (maxChangeAllowed - diminishingEndOfHourDifference) + ".");
-
-                        // LOGGER.info("Coin is too volatile. Not buying. Current change: " +
-                        // currentChange
-                        // + ", Max Change Allowed: " + maxChangeAllowed + ".");
-                        // potentialWinningCoin = null;
-                        // break;
-                        // } else {
-                        didTradePreviousHour = true;
-                        diminishingEndOfHourDifference = 5;
                         StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                         strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                         strategyCoinWatchers.add(strategyCoinWatcher);
-                        // }
+
+                        Double currentChange = record - dynamicEndOfHourLossRecord;
+
+                        if (currentChange > (maxChangeAllowed - diminishingEndOfHourDifference)) {
+                            potentialWinningCoin = null;
+                            break;
+                        } else {
+                            didTradePreviousHour = true;
+                            diminishingEndOfHourDifference = 5;
+                        }
                     }
 
                     if (dynamicEndOfHourLossRecord != 0.0
@@ -205,26 +199,29 @@ public class Hourly24BearStrategy {
     private Double recordEndOfHourLossDifference(Double hourLoss, Double lowestEndOfHourLoss) {
 
         Double record = ((hourLoss - lowestEndOfHourLoss) / lowestEndOfHourLoss) * 100;
+        Double currentChange = record - dynamicEndOfHourLossRecord;
 
-        endOfHourDifferences.add(record);
+        if (currentChange < (maxChangeAllowed - diminishingEndOfHourDifference)) {
+            endOfHourDifferences.add(record);
 
-        Collections.sort(endOfHourDifferences);
+            Collections.sort(endOfHourDifferences);
 
-        if (endOfHourDifferences.size() > 10) {
-            do {
-                endOfHourDifferences.remove(0);
-            } while (endOfHourDifferences.size() > 10);
+            if (endOfHourDifferences.size() > 10) {
+                do {
+                    endOfHourDifferences.remove(0);
+                } while (endOfHourDifferences.size() > 10);
+            }
+
+            StringBuilder data = new StringBuilder();
+
+            data.append("End of Hour Difference Data (Hourly Bear Strategy):");
+
+            for (Double endOfHourDifference : endOfHourDifferences) {
+                data.append(" [ " + endOfHourDifference + " ] ");
+            }
+
+            LOGGER.info(data.toString());
         }
-
-        StringBuilder data = new StringBuilder();
-
-        data.append("End of Hour Difference Data (Hourly Bear Strategy):");
-
-        for (Double endOfHourDifference : endOfHourDifferences) {
-            data.append(" [ " + endOfHourDifference + " ] ");
-        }
-
-        LOGGER.info(data.toString());
 
         return record;
     }
