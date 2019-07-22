@@ -62,6 +62,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     private Boolean testMode;
 
     private List<Coin> coins = new ArrayList<>();
+    private List<WinningCoin> soldCoins = new ArrayList<>();
     private Boolean isInitialized = false;
     private Boolean isTrading = false;
     private Double totalProfit = 0.0;
@@ -136,13 +137,12 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
 
                     totalProfit = totalProfit + winningCoin.getProfit();
 
+                    soldCoins.add(winningCoin);
+
                     LOGGER.info("TOTAL PROFIT: " + totalProfit + "%");
                     LOGGER.info("*****************************************************");
 
-                    if (!testMode) {
-                        emailHandler.sendEmail("Sold Coin: " + winningCoin.getSymbol(),
-                                "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
-                    } else {
+                    if (testMode) {
                         emailHandler.sendEmail("Sold Coin (Test Mode): " + winningCoin.getSymbol(),
                                 "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
                     }
@@ -188,24 +188,32 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     private void updateCandleSticksForNewDay() {
 
         if (!isTrading) {
-            LOGGER.info("Getting candle sticks for new day...");
-            if (!testMode) {
-                emailHandler.sendEmail("Daily Update - Updating Daily Candle Sticks",
-                        "Binance Crypto Bot is currently not trading. Updating daily candle sticks for new day.");
-            } else {
-                emailHandler.sendEmail("Daily Update - Updating Daily Candle Sticks (Test Mode)",
-                        "Binance Crypto Bot is currently not trading. Updating daily candle sticks for new day.");
-            }
-
             coins = klinesService.getAllCandleSticks_24H(coins);
-        } else {
-            if (!testMode) {
-                emailHandler.sendEmail("Daily Update - Currently Trading",
-                        "Binance Crypto Bot is currently trading, but will update daily candle sticks after trade has complete.");
-            } else {
-                emailHandler.sendEmail("Daily Update - Currently Trading (Test Mode)",
-                        "Binance Crypto Bot is currently trading, but will update daily candle sticks after trade has complete.");
-            }
         }
+    }
+
+    @Scheduled(cron = "05 0 0 * * *", zone = "UTC")
+    private void sendDailyReport() {
+
+        String report = "Total daily profit: " + totalProfit + "\n\n";
+
+        for (WinningCoin soldCoin : soldCoins) {
+            report = report + "Symbol: " + soldCoin.getSymbol() + "\n";
+            report = report + "Buy Price: " + soldCoin.getBuyPrice() + "\n";
+            report = report + "Sell Price: " + soldCoin.getSellPrice() + "\n";
+            report = report + "Highest Price: " + soldCoin.getHighestPrice() + "\n";
+            report = report + "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice()
+                    + "\n";
+            report = report + "Profit: " + soldCoin.getProfit() + "\n\n";
+        }
+
+        if (!testMode) {
+            emailHandler.sendEmail("Daily Report", report);
+        } else {
+            emailHandler.sendEmail("Daily Report (Test Mode)", report);
+        }
+
+        totalProfit = 0.0;
+        soldCoins.clear();
     }
 }
