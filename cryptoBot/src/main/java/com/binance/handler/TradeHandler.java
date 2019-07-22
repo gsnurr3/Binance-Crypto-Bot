@@ -75,7 +75,11 @@ public class TradeHandler {
                 && winningCoin.getProfitSinceBuyPrice() > lossBeforeSelling) {
             holdCoin(winningCoin);
         } else {
-            sellCoin(winningCoin);
+            if (winningCoin.getCurrentPrice() > winningCoin.getPrices().get(winningCoin.getPrices().size() - 2)) {
+                holdCoin(winningCoin);
+            } else {
+                sellCoin(winningCoin);
+            }
         }
 
         return winningCoin;
