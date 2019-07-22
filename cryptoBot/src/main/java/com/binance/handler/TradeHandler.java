@@ -69,13 +69,16 @@ public class TradeHandler {
 
         if (!winningCoin.isBought()) {
             buyCoin(winningCoin);
+        } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() <= lossBeforeSelling) {
+            sellCoin(winningCoin);
         } else if (winningCoin.isBought() && maxTradeTimeCounter / 720 >= maxTradeTime) {
             sellCoin(winningCoin);
         } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() < profitBeforeSelling
                 && winningCoin.getProfitSinceBuyPrice() > lossBeforeSelling) {
             holdCoin(winningCoin);
         } else {
-            if (winningCoin.getCurrentPrice() > winningCoin.getPrices().get(winningCoin.getPrices().size() - 2)) {
+            if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() >= profitBeforeSelling && winningCoin
+                    .getCurrentPrice() > winningCoin.getPrices().get(winningCoin.getPrices().size() - 2)) {
                 holdCoin(winningCoin);
             } else {
                 sellCoin(winningCoin);
