@@ -24,6 +24,8 @@ public class WinningCoin extends Coin {
     private Boolean isBought = false;
     private Boolean isSold = false;
     private Boolean isHourly24Bear = false;
+    private long timeInMinutesTrading;
+    private String buyDateAndTime;
 
     public WinningCoin() {
 
@@ -130,12 +132,29 @@ public class WinningCoin extends Coin {
         this.isHourly24Bear = isHourly24Bear;
     }
 
+    public long getTimeInMinutesTrading() {
+        return timeInMinutesTrading;
+    }
+
+    public void setTimeInMinutesTrading(long timeInMinutesTrading) {
+        this.timeInMinutesTrading = timeInMinutesTrading;
+    }
+
+    public String getBuyDateAndTime() {
+        return buyDateAndTime;
+    }
+
+    public void setBuyDateAndTime(String buyDateAndTime) {
+        this.buyDateAndTime = buyDateAndTime;
+    }
+
     @Override
     public String toString() {
-        return "WinningCoin [buyPrice=" + buyPrice + ", currentPrice=" + currentPrice + ", highestPrice=" + highestPrice
-                + ", isBought=" + isBought + ", isHourly24Bear=" + isHourly24Bear + ", isSold=" + isSold
-                + ", marginFromCurrentAndHighestPrice=" + marginFromCurrentAndHighestPrice + ", profit=" + profit
-                + ", profitSinceBuyPrice=" + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", usdtPrice="
-                + usdtPrice + "]";
+        return "WinningCoin [buyDateAndTime=" + buyDateAndTime + ", buyPrice=" + buyPrice + ", currentPrice="
+                + currentPrice + ", highestPrice=" + highestPrice + ", isBought=" + isBought + ", isHourly24Bear="
+                + isHourly24Bear + ", isSold=" + isSold + ", marginFromCurrentAndHighestPrice="
+                + marginFromCurrentAndHighestPrice + ", profit=" + profit + ", profitSinceBuyPrice="
+                + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", timeInMinutesTrading=" + timeInMinutesTrading
+                + ", usdtPrice=" + usdtPrice + "]";
     }
 }

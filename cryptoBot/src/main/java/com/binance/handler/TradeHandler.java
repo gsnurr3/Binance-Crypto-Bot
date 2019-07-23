@@ -5,6 +5,7 @@ import java.net.SocketTimeoutException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import com.binance.model.Account;
 import com.binance.model.Balance;
@@ -13,6 +14,7 @@ import com.binance.model.Order;
 import com.binance.model.WinningCoin;
 import com.binance.service.AccountService;
 import com.binance.service.OrderService;
+import com.google.common.base.Stopwatch;
 
 import org.apache.http.conn.ConnectTimeoutException;
 import org.slf4j.Logger;
@@ -57,6 +59,8 @@ public class TradeHandler {
     private Double maxTradeTimeCounter;
 
     private int holdCoinCount;
+
+    private Stopwatch tradeWatch;
 
     public WinningCoin tradeCoin(WinningCoin winningCoin)
             throws ResourceAccessException, SocketTimeoutException, IOException, NullPointerException {
@@ -130,6 +134,8 @@ public class TradeHandler {
             winningCoin.setBuyPrice(winningCoin.getCurrentPrice());
         }
 
+        tradeWatch = Stopwatch.createStarted();
+
         winningCoin.setProfitSinceBuyPrice();
         winningCoin.setBought(true);
 
@@ -140,6 +146,10 @@ public class TradeHandler {
         LOGGER.info("UTC Time is: " + dateFormat.format(date));
         LOGGER.info("******************** BUYING COIN ********************");
         LOGGER.info(winningCoin.getSymbol() + " - " + winningCoin.toString());
+
+        dateFormat.setTimeZone(TimeZone.getTimeZone("EST"));
+
+        winningCoin.setBuyDateAndTime(dateFormat.format(date));
     }
 
     private void holdCoin(WinningCoin winningCoin) {
@@ -186,6 +196,9 @@ public class TradeHandler {
             winningCoin.setSellPrice(winningCoin.getCurrentPrice());
         }
 
+        tradeWatch.stop();
+
+        winningCoin.setTimeInMinutesTrading(tradeWatch.elapsed(TimeUnit.MINUTES));
         winningCoin.setProfitSinceBuyPrice();
         winningCoin.setProfit();
         winningCoin.setSold(true);

@@ -90,8 +90,9 @@ public class StrategyHandler {
                     potentialWinningCoin = hourly24BearStrategy.checkIfCoinIsTradable(potentialCoin);
 
                     if (potentialWinningCoin == null) {
-                        message = "Condition 2 failed. Potential winning coin will be removed from further evaluation: "
-                                + potentialCoin.getSymbol();
+                        // message = "Condition 2 failed. Potential winning coin will be removed from
+                        // further evaluation: "
+                        // + potentialCoin.getSymbol();
                         continue;
                     }
 
@@ -99,8 +100,9 @@ public class StrategyHandler {
                     potentialWinningCoin = hourly24BearStrategy.checkCandleStick_1HFromPreviousHour(potentialCoin);
 
                     if (potentialWinningCoin == null) {
-                        message = "Condition 3 failed. Potential winning coin will be removed from further evaluation: "
-                                + potentialCoin.getSymbol();
+                        // message = "Condition 3 failed. Potential winning coin will be removed from
+                        // further evaluation: "
+                        // + potentialCoin.getSymbol();
                         continue;
                     }
 
@@ -108,8 +110,9 @@ public class StrategyHandler {
                     potentialWinningCoin = hourly24BearStrategy.checkIfCoinMarketIsTooBear(potentialCoin);
 
                     if (potentialWinningCoin == null) {
-                        message = "Condition 4 failed. Potential winning coin will be removed from further evaluation: "
-                                + potentialCoin.getSymbol();
+                        // message = "Condition 4 failed. Potential winning coin will be removed from
+                        // further evaluation: "
+                        // + potentialCoin.getSymbol();
                         continue;
                     }
 
@@ -117,7 +120,7 @@ public class StrategyHandler {
                     potentialWinningCoin = hourly24BearStrategy.checkIfCandleStick_1HIsANewLowRecord(potentialCoin);
 
                     if (potentialWinningCoin != null) {
-                        message = "Condition 5 passed. All conditions passed. Buying "
+                        message = "Condition 5 passed. All conditions passed for "
                                 + potentialWinningCoin.getSymbol() + " !!!";
                         break;
                     } else {

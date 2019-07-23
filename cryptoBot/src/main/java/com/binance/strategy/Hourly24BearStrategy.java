@@ -149,10 +149,10 @@ public class Hourly24BearStrategy {
                     Double record = recordEndOfHourLossDifference(hourLoss, lowestEndOfHourLoss);
 
                     if (dynamicEndOfHourLossRecord == 0.0) {
-                        LOGGER.info("Hour loss: " + hourLoss + ", Lowest end of hour loss: " + lowestEndOfHourLoss);
+                        LOGGER.info("Hour loss: " + hourLoss + "/ Lowest end of hour loss: " + lowestEndOfHourLoss);
                     } else {
-                        LOGGER.info("(Dynamic) - Hour loss: " + record + ", Lowest end of hour loss: "
-                                + dynamicEndOfHourLossRecord);
+                        LOGGER.info("(Dynamic) - Hour loss: " + record + "/ Buy range: ["
+                                + dynamicEndOfHourLossRecord + "] - [" + (dynamicEndOfHourLossRecord + 15) + "]");
                     }
 
                     Double currentChange = record - dynamicEndOfHourLossRecord;
@@ -161,17 +161,17 @@ public class Hourly24BearStrategy {
                         potentialWinningCoin = null;
                         break;
                     } else {
-                        if (currentChange > 10) {
+                        if (currentChange > 15) {
                             StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                             strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                             strategyCoinWatchers.add(strategyCoinWatcher);
-                        } else if (currentChange >= -5 && currentChange <= 5) {
+                        } else if (currentChange >= -0.0 && currentChange <= 15) {
                             StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                             strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                             strategyCoinWatchers.add(strategyCoinWatcher);
                         }
 
-                        if (currentChange < -5 || currentChange > 5) {
+                        if (currentChange < -0.0 || currentChange > 15) {
                             potentialWinningCoin = null;
                             break;
                         }
@@ -195,7 +195,7 @@ public class Hourly24BearStrategy {
         Double record = ((hourLoss - lowestEndOfHourLoss) / lowestEndOfHourLoss) * 100;
         Double currentChange = record - dynamicEndOfHourLossRecord;
 
-        if (currentChange <= 10) {
+        if (currentChange <= 15) {
             endOfHourDifferences.add(record);
 
             Collections.sort(endOfHourDifferences);

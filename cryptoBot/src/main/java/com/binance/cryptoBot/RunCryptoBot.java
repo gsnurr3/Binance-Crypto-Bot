@@ -192,19 +192,28 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
         }
     }
 
+    @Scheduled(cron = "0 0 12 * * *", zone = "UTC")
+    private void sendHealthStatus() {
+
+        if (!testMode) {
+            emailHandler.sendEmail("Health Status", "Binance Crypto Bot is still running.");
+        }
+    }
+
     @Scheduled(cron = "05 0 0 * * *", zone = "UTC")
     private void sendDailyReport() {
 
         String report = "Total Daily Profit: " + totalProfit + "\n\n";
 
         for (WinningCoin soldCoin : soldCoins) {
-            report = report + "Symbol: " + soldCoin.getSymbol() + "\n";
-            report = report + "Buy Price: " + soldCoin.getBuyPrice() + "\n";
-            report = report + "Sell Price: " + soldCoin.getSellPrice() + "\n";
-            report = report + "Highest Price: " + soldCoin.getHighestPrice() + "\n";
-            report = report + "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice()
-                    + "\n";
-            report = report + "Profit: " + soldCoin.getProfit() + "\n\n";
+            report += "Symbol: " + soldCoin.getSymbol() + "\n";
+            report += "Date / Time of Purchase (EST): " + soldCoin.getBuyDateAndTime() + "\n";
+            report += "Trade Time (Minutes): " + soldCoin.getTimeInMinutesTrading() + "\n";
+            report += "Buy Price: " + soldCoin.getBuyPrice() + "\n";
+            report += "Sell Price: " + soldCoin.getSellPrice() + "\n";
+            report += "Highest Price: " + soldCoin.getHighestPrice() + "\n";
+            report += "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice() + "\n";
+            report += "Profit: " + soldCoin.getProfit() + "\n\n";
         }
 
         if (!testMode) {
