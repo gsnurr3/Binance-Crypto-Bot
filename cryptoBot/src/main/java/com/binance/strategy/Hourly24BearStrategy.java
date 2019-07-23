@@ -149,10 +149,12 @@ public class Hourly24BearStrategy {
                     Double record = recordEndOfHourLossDifference(hourLoss, lowestEndOfHourLoss);
 
                     if (dynamicEndOfHourLossRecord == 0.0) {
-                        LOGGER.info("Hour loss: " + hourLoss + "/ Lowest end of hour loss: " + lowestEndOfHourLoss);
+                        LOGGER.info(potentialWinningCoin.getSymbol() + " / Hour loss: " + hourLoss
+                                + " / Lowest end of hour loss: " + lowestEndOfHourLoss);
                     } else {
-                        LOGGER.info("(Dynamic) - Hour loss: " + record + "/ Buy range: ["
-                                + dynamicEndOfHourLossRecord + "] - [" + (dynamicEndOfHourLossRecord + 15) + "]");
+                        LOGGER.info(potentialWinningCoin.getSymbol() + " / (Dynamic) - Hour loss: " + record
+                                + " / Buy range: [ " + dynamicEndOfHourLossRecord + " ] - [ "
+                                + (dynamicEndOfHourLossRecord + 15) + " ]");
                     }
 
                     Double currentChange = record - dynamicEndOfHourLossRecord;
