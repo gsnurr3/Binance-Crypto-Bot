@@ -144,7 +144,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
 
                     if (testMode) {
                         emailHandler.sendEmail("Sold Coin (Test Mode): " + winningCoin.getSymbol(),
-                                "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit);
+                                "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit + "%");
                     }
 
                     coins = klinesService.getAllCandleSticks_1H(coins);
@@ -203,7 +203,11 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     @Scheduled(cron = "05 0 0 * * *", zone = "UTC")
     private void sendDailyReport() {
 
-        String report = "Total Daily Profit: " + totalProfit + "\n\n";
+        String report = "Total Daily Profit: " + totalProfit + "%\n";
+
+        Double fees = 0.15 * soldCoins.size();
+
+        report += "Total Daily Profit After Fees: " + (totalProfit - fees) + "%\n\n";
 
         for (WinningCoin soldCoin : soldCoins) {
             report += "Symbol: " + soldCoin.getSymbol() + "\n";
@@ -212,8 +216,8 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
             report += "Buy Price: " + soldCoin.getBuyPrice() + "\n";
             report += "Sell Price: " + soldCoin.getSellPrice() + "\n";
             report += "Highest Price: " + soldCoin.getHighestPrice() + "\n";
-            report += "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice() + "\n";
-            report += "Profit: " + soldCoin.getProfit() + "\n\n";
+            report += "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice() + "%\n";
+            report += "Profit: " + soldCoin.getProfit() + "%\n\n";
         }
 
         if (!testMode) {
