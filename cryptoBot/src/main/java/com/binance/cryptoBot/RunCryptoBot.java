@@ -65,6 +65,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     private List<WinningCoin> soldCoins = new ArrayList<>();
     private Boolean isInitialized = false;
     private Boolean isTrading = false;
+    private Double highestTotalProfit = 0.0;
     private Double totalProfit = 0.0;
 
     @Override
@@ -137,6 +138,10 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
 
                     totalProfit = totalProfit + winningCoin.getProfit();
 
+                    if (totalProfit > highestTotalProfit) {
+                        highestTotalProfit = totalProfit;
+                    }
+
                     soldCoins.add(winningCoin);
 
                     LOGGER.info("TOTAL PROFIT: " + totalProfit + "%");
@@ -157,7 +162,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-        } while (totalProfit > maxLossAllowed);
+        } while ((totalProfit - highestTotalProfit) > maxLossAllowed);
 
         if (!testMode) {
             emailHandler.sendEmail("Max Loss Breached - Shutting Down Binance Crypto Bot",
@@ -227,6 +232,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
             emailHandler.sendEmail("Daily Report (Test Mode)", report);
         }
 
+        highestTotalProfit = 0.0;
         totalProfit = 0.0;
         soldCoins.clear();
     }
