@@ -195,7 +195,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
     @Scheduled(cron = "05 0 0 * * *", zone = "UTC")
     private void sendDailyReport() {
 
-        String report = "Total daily profit: " + totalProfit + "\n\n";
+        String report = "Total Daily Profit: " + totalProfit + "\n\n";
 
         for (WinningCoin soldCoin : soldCoins) {
             report = report + "Symbol: " + soldCoin.getSymbol() + "\n";

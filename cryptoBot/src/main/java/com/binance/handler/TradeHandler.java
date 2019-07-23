@@ -54,7 +54,7 @@ public class TradeHandler {
 
     private Double quantity;
 
-    private int maxTradeTimeCounter;
+    private Double maxTradeTimeCounter;
 
     private int holdCoinCount;
 
@@ -71,18 +71,13 @@ public class TradeHandler {
             buyCoin(winningCoin);
         } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() <= lossBeforeSelling) {
             sellCoin(winningCoin);
-        } else if (winningCoin.isBought() && maxTradeTimeCounter / 720 >= maxTradeTime) {
+        } else if (winningCoin.isBought() && maxTradeTimeCounter / 720.00 >= maxTradeTime) {
             sellCoin(winningCoin);
         } else if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() < profitBeforeSelling
                 && winningCoin.getProfitSinceBuyPrice() > lossBeforeSelling) {
             holdCoin(winningCoin);
         } else {
-            if (winningCoin.isBought() && winningCoin.getProfitSinceBuyPrice() >= profitBeforeSelling && winningCoin
-                    .getCurrentPrice() > winningCoin.getPrices().get(winningCoin.getPrices().size() - 2)) {
-                holdCoin(winningCoin);
-            } else {
-                sellCoin(winningCoin);
-            }
+            sellCoin(winningCoin);
         }
 
         return winningCoin;
@@ -91,7 +86,7 @@ public class TradeHandler {
     private void buyCoin(WinningCoin winningCoin) throws ResourceAccessException, SocketTimeoutException, IOException,
             NullPointerException, ConnectTimeoutException {
 
-        maxTradeTimeCounter = 0;
+        maxTradeTimeCounter = 0.0;
         holdCoinCount = 0;
 
         if (!testMode) {
@@ -149,7 +144,7 @@ public class TradeHandler {
 
     private void holdCoin(WinningCoin winningCoin) {
 
-        maxTradeTimeCounter++;
+        maxTradeTimeCounter = maxTradeTimeCounter + 1.0;
         holdCoinCount++;
         winningCoin.setProfitSinceBuyPrice();
 

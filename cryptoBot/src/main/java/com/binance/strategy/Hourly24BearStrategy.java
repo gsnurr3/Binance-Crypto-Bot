@@ -28,17 +28,12 @@ public class Hourly24BearStrategy {
     @Autowired
     EmailHandler emailHandler;
 
-    @Value("${hourly.24.bear.strategy.maxChangeAllowed}")
-    private int maxChangeAllowed;
-
     @Value("${hourly.24.bear.strategy.timeSinceLastTrade.limit}")
     private int timeSinceLastTradeLimit;
 
     private List<StrategyCoinWatcher> strategyCoinWatchers = new ArrayList<>();
     private List<Double> endOfHourDifferences = new ArrayList<>();
     private Double dynamicEndOfHourLossRecord = 0.0;
-    private Boolean didTradePreviousHour = false;
-    private int diminishingEndOfHourDifference = 5;
 
     // Condition 2
     public PotentialWinningCoin checkIfCoinIsTradable(PotentialWinningCoin potentialWinningCoin) {
@@ -160,32 +155,31 @@ public class Hourly24BearStrategy {
                                 + dynamicEndOfHourLossRecord);
                     }
 
+                    Double currentChange = record - dynamicEndOfHourLossRecord;
+
                     if (dynamicEndOfHourLossRecord == 0.0) {
                         potentialWinningCoin = null;
                         break;
-                    } else if (record < dynamicEndOfHourLossRecord) {
-                        potentialWinningCoin = null;
-                        break;
                     } else {
-                        StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
-                        strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
-                        strategyCoinWatchers.add(strategyCoinWatcher);
+                        if (currentChange > 10) {
+                            StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
+                            strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
+                            strategyCoinWatchers.add(strategyCoinWatcher);
+                        } else if (currentChange >= -5 && currentChange <= 5) {
+                            StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
+                            strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
+                            strategyCoinWatchers.add(strategyCoinWatcher);
+                        }
 
-                        Double currentChange = record - dynamicEndOfHourLossRecord;
-
-                        if (currentChange > (maxChangeAllowed - diminishingEndOfHourDifference)) {
+                        if (currentChange < -5 || currentChange > 5) {
                             potentialWinningCoin = null;
                             break;
-                        } else {
-                            didTradePreviousHour = true;
-                            diminishingEndOfHourDifference = 5;
                         }
                     }
 
                     if (dynamicEndOfHourLossRecord != 0.0
                             && endOfHourDifferences.get(endOfHourDifferences.size() - 1) > dynamicEndOfHourLossRecord) {
-                        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1)
-                                + diminishingEndOfHourDifference;
+                        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1);
                     }
                 }
             }
@@ -201,7 +195,7 @@ public class Hourly24BearStrategy {
         Double record = ((hourLoss - lowestEndOfHourLoss) / lowestEndOfHourLoss) * 100;
         Double currentChange = record - dynamicEndOfHourLossRecord;
 
-        if (currentChange < (maxChangeAllowed - diminishingEndOfHourDifference)) {
+        if (currentChange <= 10) {
             endOfHourDifferences.add(record);
 
             Collections.sort(endOfHourDifferences);
@@ -229,16 +223,7 @@ public class Hourly24BearStrategy {
     @Scheduled(cron = "10 0 * * * *", zone = "UTC")
     private void resetHourlyBearData() {
 
-        if (didTradePreviousHour == false && dynamicEndOfHourLossRecord != 0.0) {
-            if (diminishingEndOfHourDifference > 0) {
-                diminishingEndOfHourDifference--;
-            }
-        } else {
-            didTradePreviousHour = false;
-        }
-
-        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1)
-                + diminishingEndOfHourDifference;
+        dynamicEndOfHourLossRecord = endOfHourDifferences.get(endOfHourDifferences.size() - 1);
 
         endOfHourDifferences.clear();
     }
