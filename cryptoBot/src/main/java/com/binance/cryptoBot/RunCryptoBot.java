@@ -114,12 +114,12 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                         } catch (ResourceAccessException | SocketTimeoutException | ConnectTimeoutException
                                 | NullPointerException e1) {
                             LOGGER.error(e1.toString());
-                            emailHandler.sendEmail("Error", e1.toString());
+                            emailHandler.sendEmail("Buy or Account Error", e1.toString());
                             isTrading = false;
                             this.onApplicationEvent(event);
                         } catch (IOException e2) {
                             LOGGER.error(e2.toString());
-                            emailHandler.sendEmail("Error", e2.toString());
+                            emailHandler.sendEmail("Buy or Account Error", e2.toString());
                             isTrading = false;
                             this.onApplicationEvent(event);
                         }
@@ -216,7 +216,8 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
             report += "Buy Price: " + soldCoin.getBuyPrice() + "\n";
             report += "Sell Price: " + soldCoin.getSellPrice() + "\n";
             report += "Highest Price: " + soldCoin.getHighestPrice() + "\n";
-            report += "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice() + "%\n";
+            report += "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice()
+                    + "%\n";
             report += "Profit: " + soldCoin.getProfit() + "%\n\n";
         }
 

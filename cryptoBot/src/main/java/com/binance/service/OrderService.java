@@ -44,7 +44,7 @@ public class OrderService {
         } catch (ResourceAccessException | SocketTimeoutException | ConnectTimeoutException | NullPointerException e1) {
 
             LOGGER.error(e1.toString());
-            emailHandler.sendEmail("Error", e1.toString());
+            emailHandler.sendEmail("Sell Error", e1.toString());
 
             try {
                 Thread.sleep(5000);
@@ -54,7 +54,7 @@ public class OrderService {
             this.postSellOrder(winningCoin, quantity);
         } catch (IOException e3) {
             LOGGER.error(e3.toString());
-            emailHandler.sendEmail("Error", e3.toString());
+            emailHandler.sendEmail("Sell Error", e3.toString());
 
             try {
                 Thread.sleep(5000);

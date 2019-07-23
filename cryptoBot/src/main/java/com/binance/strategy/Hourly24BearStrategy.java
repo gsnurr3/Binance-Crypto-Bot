@@ -31,6 +31,12 @@ public class Hourly24BearStrategy {
     @Value("${hourly.24.bear.strategy.timeSinceLastTrade.limit}")
     private int timeSinceLastTradeLimit;
 
+    @Value("${hourly.24.bear.strategy.buyRangeLowEnd}")
+    private Double buyRangeLowEnd;
+
+    @Value("${hourly.24.bear.strategy.buyRangeHighEnd}")
+    private Double buyRangeHighEnd;
+    
     private List<StrategyCoinWatcher> strategyCoinWatchers = new ArrayList<>();
     private List<Double> endOfHourDifferences = new ArrayList<>();
     private Double dynamicEndOfHourLossRecord = 0.0;
@@ -153,8 +159,8 @@ public class Hourly24BearStrategy {
                                 + " / Lowest end of hour loss: " + lowestEndOfHourLoss);
                     } else {
                         LOGGER.info(potentialWinningCoin.getSymbol() + " / (Dynamic) - Hour loss: " + record
-                                + " / Buy range: [ " + dynamicEndOfHourLossRecord + " ] - [ "
-                                + (dynamicEndOfHourLossRecord + 15) + " ]");
+                                + " / Buy range: [ " + (dynamicEndOfHourLossRecord + buyRangeLowEnd) + " ] - [ "
+                                + (dynamicEndOfHourLossRecord + buyRangeHighEnd) + " ]");
                     }
 
                     Double currentChange = record - dynamicEndOfHourLossRecord;
@@ -163,17 +169,17 @@ public class Hourly24BearStrategy {
                         potentialWinningCoin = null;
                         break;
                     } else {
-                        if (currentChange > 15) {
+                        if (currentChange > buyRangeHighEnd) {
                             StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                             strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                             strategyCoinWatchers.add(strategyCoinWatcher);
-                        } else if (currentChange >= -0.0 && currentChange <= 15) {
+                        } else if (currentChange >= buyRangeLowEnd && currentChange <= buyRangeHighEnd) {
                             StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                             strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                             strategyCoinWatchers.add(strategyCoinWatcher);
                         }
 
-                        if (currentChange < -0.0 || currentChange > 15) {
+                        if (currentChange < buyRangeLowEnd || currentChange > buyRangeHighEnd) {
                             potentialWinningCoin = null;
                             break;
                         }
@@ -197,7 +203,7 @@ public class Hourly24BearStrategy {
         Double record = ((hourLoss - lowestEndOfHourLoss) / lowestEndOfHourLoss) * 100;
         Double currentChange = record - dynamicEndOfHourLossRecord;
 
-        if (currentChange <= 15) {
+        if (currentChange <= buyRangeHighEnd) {
             endOfHourDifferences.add(record);
 
             Collections.sort(endOfHourDifferences);
