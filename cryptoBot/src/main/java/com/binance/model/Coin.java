@@ -18,6 +18,8 @@ public class Coin {
     private List<CandleStick_1H> candleSticks_1H = new ArrayList<>();
     private List<CandleStick_24H> candleSticks_24H = new ArrayList<>();
 
+    private Boolean isBanned = true;
+
     public Coin() {
 
     }
@@ -81,9 +83,17 @@ public class Coin {
         this.candleSticks_24H.add(candleStick_24H);
     }
 
+    public Boolean isBanned() {
+        return isBanned;
+    }
+
+    public void setIsBanned(Boolean isBanned) {
+        this.isBanned = isBanned;
+    }
+
     @Override
     public String toString() {
-        return "Coin [candleSticks_1H=" + candleSticks_1H + ", candleSticks_24H=" + candleSticks_24H + ", prices="
-                + prices + ", status=" + status + ", symbol=" + symbol + "]";
+        return "Coin [candleSticks_1H=" + candleSticks_1H + ", candleSticks_24H=" + candleSticks_24H + ", isBanned="
+                + isBanned + ", prices=" + prices + ", status=" + status + ", symbol=" + symbol + "]";
     }
 }

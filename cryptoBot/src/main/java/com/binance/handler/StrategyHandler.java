@@ -40,7 +40,7 @@ public class StrategyHandler {
 
         for (Coin coin : coins) {
 
-            if (coin.getPrices().get(coin.getPrices().size() - 1) >= minPriceAllowed && !isBanned(coin)) {
+            if (!isBanned(coin)) {
 
                 if (coin.getPrices().get(coin.getPrices().size() - 1) < coin.getCandleSticks_1H()
                         .get(coin.getCandleSticks_1H().size() - 1).getLowPrice()) {
@@ -143,12 +143,134 @@ public class StrategyHandler {
 
     private Boolean isBanned(Coin coin) {
 
-        Boolean isBanned = false;
-
-        if (coin.getSymbol().equals("BTCBBTC")) {
-            isBanned = true;
+        if (coin.getSymbol().equals("ETHBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("XRPBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("LTCBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("BCHABCBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("EOSBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("XLMBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ALGOBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("TRXBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ADABTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("XMRBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("DASHBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("LINKBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("IOTABTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("NEOBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ATOMBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ETCBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("XEMBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ONTBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("BTGBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ZECBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("DOGEBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("VETBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("BATBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("QTUMBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("DCRBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("LSKBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("RVNBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("HOTBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("OMGBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("NANOBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("BCDBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("NPXSBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("WAVESBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ZRXBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("HCBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("KMDBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("REPBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("BTSBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("SCBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("IOSTBTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("THETABTC")) {
+            coin.setIsBanned(false);
+        }
+        if (coin.getSymbol().equals("ICXBTC")) {
+            coin.setIsBanned(false);
         }
 
-        return isBanned;
+
+        return coin.isBanned();
     }
 }

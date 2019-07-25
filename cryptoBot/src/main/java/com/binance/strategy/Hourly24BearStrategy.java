@@ -174,6 +174,7 @@ public class Hourly24BearStrategy {
                             strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                             strategyCoinWatchers.add(strategyCoinWatcher);
                         } else if (currentChange >= buyRangeLowEnd && currentChange <= buyRangeHighEnd) {
+                            potentialWinningCoin.setRecord(record);
                             StrategyCoinWatcher strategyCoinWatcher = new StrategyCoinWatcher();
                             strategyCoinWatcher.setSymbol(potentialWinningCoin.getSymbol());
                             strategyCoinWatchers.add(strategyCoinWatcher);

@@ -103,6 +103,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                             potentialWinningCoin.getStatus(), potentialWinningCoin.getPrices(),
                             potentialWinningCoin.getCandleSticks_1H(), potentialWinningCoin.getCandleSticks_24H());
                     winningCoin.setIsHourly24Bear(potentialWinningCoin.isHourly24Bear());
+                    winningCoin.setRecord(potentialWinningCoin.getRecord());
 
                     isTrading = true;
 
@@ -147,7 +148,10 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
                     LOGGER.info("TOTAL PROFIT: " + totalProfit + "%");
                     LOGGER.info("*****************************************************");
 
-                    if (testMode) {
+                    if (!testMode) {
+                        emailHandler.sendEmail("Sold Coin: " + winningCoin.getSymbol(),
+                                "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit + "%");
+                    } else if (testMode) {
                         emailHandler.sendEmail("Sold Coin (Test Mode): " + winningCoin.getSymbol(),
                                 "Winning Coin: " + winningCoin.toString() + ", Total profit: " + totalProfit + "%");
                     }
@@ -223,6 +227,7 @@ public class RunCryptoBot implements ApplicationListener<ApplicationReadyEvent> 
             report += "Highest Price: " + soldCoin.getHighestPrice() + "\n";
             report += "Difference Sell Price / Highest Price: " + soldCoin.getMarginFromCurrentAndHighestPrice()
                     + "%\n";
+            report += "Record: " + soldCoin.getRecord() + "\n";
             report += "Profit: " + soldCoin.getProfit() + "%\n\n";
         }
 

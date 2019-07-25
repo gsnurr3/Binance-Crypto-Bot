@@ -26,6 +26,7 @@ public class WinningCoin extends Coin {
     private Boolean isHourly24Bear = false;
     private long timeInMinutesTrading;
     private String buyDateAndTime;
+    private Double record;
 
     public WinningCoin() {
 
@@ -148,13 +149,21 @@ public class WinningCoin extends Coin {
         this.buyDateAndTime = buyDateAndTime;
     }
 
+    public Double getRecord() {
+        return record;
+    }
+
+    public void setRecord(Double record) {
+        this.record = record;
+    }
+
     @Override
     public String toString() {
         return "WinningCoin [buyDateAndTime=" + buyDateAndTime + ", buyPrice=" + buyPrice + ", currentPrice="
                 + currentPrice + ", highestPrice=" + highestPrice + ", isBought=" + isBought + ", isHourly24Bear="
                 + isHourly24Bear + ", isSold=" + isSold + ", marginFromCurrentAndHighestPrice="
                 + marginFromCurrentAndHighestPrice + ", profit=" + profit + ", profitSinceBuyPrice="
-                + profitSinceBuyPrice + ", sellPrice=" + sellPrice + ", timeInMinutesTrading=" + timeInMinutesTrading
-                + ", usdtPrice=" + usdtPrice + "]";
+                + profitSinceBuyPrice + ", record=" + record + ", sellPrice=" + sellPrice + ", timeInMinutesTrading="
+                + timeInMinutesTrading + ", usdtPrice=" + usdtPrice + "]";
     }
 }
